@@ -154,6 +154,34 @@ footer p { margin: 0 0 6px; }
 .sh:hover i { transform: scale(1.05); }
 .sh[aria-pressed="true"] i { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--fg); }
 @media (prefers-reduced-motion: reduce) { .card { animation: none; } .ring, .ib.spin svg { animation-duration: 3s; } }
+
+/* ---- vues, résultats, actus, calendrier */
+.views{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:3px;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:10px}
+.vw{border:0;background:transparent;border-radius:8px;padding:8px 4px;font:700 14px/1.2 var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);transition:all .2s}
+.vw[aria-pressed="true"]{background:var(--primary);color:var(--primary-fg)}
+.res .vs .n{opacity:.55}.res .vs .n.w{opacity:1;color:var(--fg)}
+.res .vs .n.w::before{content:"🏆 ";font-size:16px}
+.verdict{margin-top:12px;text-align:center;font:600 14px var(--cond);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.verdict small{display:block;font:400 12px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);margin-top:2px}
+.srcl{margin-top:10px;font-size:11px;color:var(--muted);text-align:right}
+.nw{display:block;color:inherit;text-decoration:none;padding:14px 16px}
+.nw:hover{border-color:var(--primary)}
+.nw .nm{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.nw h3{margin:8px 0 0;font:600 17px/1.3 var(--sans)}
+.calb{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--fg);font:700 14px var(--cond);letter-spacing:.05em;text-transform:uppercase}
+.calb:hover{background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.calb.ok{border-color:var(--border);color:var(--muted)}
+.scrim.c{justify-content:center;align-items:center;padding:16px}
+.dlg{width:min(420px,100%);max-height:100%;overflow:auto;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:22px}
+.dlg h2{font:400 32px/1 var(--display);letter-spacing:.02em;text-transform:uppercase;margin:0}
+.dlg h3{font-size:16px;margin:18px 0 8px}
+.dm{margin:8px 0 0;font-size:14px;color:var(--muted)}.dm.sm{font-size:12px}
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.seg button{flex:1;min-width:72px;padding:9px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.acts{display:grid;gap:8px;margin-top:20px}
+.btn{padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-weight:600}
+.btn.p{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
 </style>
 </head>
 <body>
@@ -168,6 +196,7 @@ footer p { margin: 0 0 6px; }
 
 <div class="bar" id="bar">
   <div class="wrap">
+    <div class="views" id="views" role="group" aria-label="Section"></div>
     <div id="normal">
       <div class="tabs" id="tabs" role="group" aria-label="Catégorie de combats"></div>
       <div class="row">
@@ -200,6 +229,8 @@ footer p { margin: 0 0 6px; }
     </div>
   </div>
 </div>
+
+<div class="scrim c" id="calScrim" hidden><div class="dlg" id="calBox" role="dialog" aria-modal="true"></div></div>
 
 <script>
 "use strict";
@@ -406,7 +437,7 @@ function cardHTML(f, i) {
     (pills ? '<div class="pills">' + pills + "</div>" : "") +
     '<div class="hype"><div class="l"><span>Hype</span><b>' + f.hype + '/100</b></div><div class="meter"><i style="width:' + f.hype + '%"></i></div>' +
     (f.why ? '<p class="why">' + esc(f.why) + "</p>" : "") + "</div>" +
-    '<div class="foot"><div class="tv">' + icon("tv") + tv + "</div>" + (f.loc ? '<div class="loc">' + icon("pin") + esc(f.loc) + "</div>" : "") + "</div></article>";
+    '<div class="foot"><div class="tv">' + icon("tv") + tv + "</div>" + (f.loc ? '<div class="loc">' + icon("pin") + esc(f.loc) + "</div>" : "") + calBtn(f) + "</div></article>";
 }
 
 function emptyHTML(title, text, retry) {
@@ -414,6 +445,9 @@ function emptyHTML(title, text, retry) {
 }
 
 function render() {
+  renderViews();
+  if (S.view !== "prog") return renderOther();
+  $("#tabs").hidden = false; $("#btnSearch").hidden = false;
   var fights = S.fights;
   var sports = []; fights.forEach(function (f) { if (sports.indexOf(f.sport) < 0) sports.push(f.sport); });
   var order = ["mma", "boxe", "kickboxing"];
@@ -485,7 +519,7 @@ $("#btnSearch").addEventListener("click", function () { setSearch(true); });
 $("#btnCancel").addEventListener("click", function () { setSearch(false); });
 $("#q").addEventListener("input", function (e) { S.q = e.target.value; render(); });
 $("#q").addEventListener("keydown", function (e) { if (e.key === "Escape") setSearch(false); });
-$("#btnRefresh").addEventListener("click", function () { load(true); });
+$("#btnRefresh").addEventListener("click", function () { if (S.view === "res") { S.rl = 0; loadResults(); } else if (S.view === "news") { S.nl = 0; loadNews(); } else load(true); });
 
 /* Gestion des Thèmes & Personnalisation */
 function applyTheme(dark, accentIndex) {
@@ -507,6 +541,258 @@ $("#btnSettings").addEventListener("click", function () { openPanel(true); });
 $("#btnClose").addEventListener("click", function () { openPanel(false); });
 $("#scrim").addEventListener("click", function (e) { if (e.target === $("#scrim")) openPanel(false); });
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#scrim").hidden) openPanel(false); });
+
+/* ===== Vues : Résultats, Actus, Calendrier ===== */
+var VIEWS = [["prog", "À venir"], ["res", "Résultats"], ["news", "Actus"]];
+S.view = "prog"; S.rsport = "mma"; S.nf = "all"; S.results = []; S.news = []; S.rs = "idle"; S.ns = "idle"; S.cal = null;
+ICONS.cal = '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/>';
+var calSet = {}; try { calSet = JSON.parse(store("nvz-cal") || "{}"); } catch (e) {}
+function flat(a) { return [].concat.apply([], a); }
+function ln(s) { return plain(s).split(/\s+/).pop(); }
+function get(url, ms, h) {
+  var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms || 10000);
+  return fetch(url, { signal: c.signal, headers: h || {} }).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error(r.status); return r.text(); });
+}
+function jget(u, ms) { return get(u, ms).then(JSON.parse); }
+function safeUrl(u) { return /^https?:\/\//i.test(u || "") ? u : "#"; }
+
+/* --- Résultats : 3 sources (base NVZ, ESPN, TheSportsDB) fusionnées --- */
+function dbRes() {
+  var t = parisToday(), h = { apikey: API_KEY, Accept: "application/json" };
+  if (API_KEY.indexOf("sb_") !== 0) h.Authorization = "Bearer " + API_KEY;
+  return get(BASE_URL + "/rest/v1/fights?select=*&event_date=lt." + t + "&event_date=gte." + addMonths(t, -2) + "&order=event_date.desc&limit=300", 10000, h).then(function (x) {
+    return JSON.parse(x).map(function (o) {
+      var a = nz(o.fighter_a), b = nz(o.fighter_b); if (!a || !b || !o.event_date) return null;
+      var wn = nz(o.winner || o.winner_name || o.result_winner), w = null;
+      if (wn) w = /nul|draw/i.test(wn) ? "draw" : ln(wn) === ln(a) ? "a" : ln(wn) === ln(b) ? "b" : null;
+      return { sport: nz(o.sport) || "mma", org: nz(o.organization) || "", event: nz(o.event_name) || "", date: String(o.event_date), a: a, b: b, w: w,
+        method: nz(o.method || o.result_method || o.result) || "", round: nz(o.round || o.result_round), time: nz(o.finish_time), title: nz(o.title), src: "NVZCombat" };
+    }).filter(Boolean);
+  }).catch(function () { return []; });
+}
+function espnRes() {
+  var t = parisToday(), from = addMonths(t, -2).replace(/-/g, ""), to = t.replace(/-/g, "");
+  return Promise.all([["ufc", "UFC"], ["pfl", "PFL"]].map(function (L) {
+    return jget("https://site.api.espn.com/apis/site/v2/sports/mma/" + L[0] + "/scoreboard?dates=" + from + "-" + to).then(function (j) {
+      var out = [];
+      (j.events || []).forEach(function (ev) { (ev.competitions || []).forEach(function (c) {
+        var st = c.status && c.status.type, cs = c.competitors || []; if (!st || !st.completed || cs.length < 2) return;
+        var nm = function (x) { return (x.athlete && x.athlete.displayName) || (x.team && x.team.displayName) || ""; };
+        var r = c.status.result || {};
+        out.push({ sport: "mma", org: L[1], event: ev.name || "", date: String(c.date || ev.date).slice(0, 10), a: nm(cs[0]), b: nm(cs[1]),
+          w: cs[0].winner ? "a" : cs[1].winner ? "b" : null, method: r.displayName || r.shortDisplayName || "", round: c.status.period || null, time: c.status.displayClock || "", src: "ESPN" });
+      }); });
+      return out;
+    }).catch(function () { return []; });
+  })).then(flat);
+}
+function tsdbRes() {
+  var min = addMonths(parisToday(), -2);
+  return Promise.all([["4445", "boxe"], ["4443", "mma"]].map(function (L) {
+    return jget("https://www.thesportsdb.com/api/v1/json/3/eventspastleague.php?id=" + L[0]).then(function (j) {
+      return (j.events || []).map(function (e) {
+        var n = (e.strEvent || "").split(/\s+vs\.?\s+/i), a = e.strHomeTeam || n[0], b = e.strAwayTeam || n[1];
+        if (!a || !b || !e.dateEvent || e.dateEvent < min) return null;
+        return { sport: L[1], org: e.strLeague || "", event: "", date: e.dateEvent, a: a, b: b, w: null, method: e.strResult ? String(e.strResult).slice(0, 140) : "", src: "TheSportsDB" };
+      }).filter(Boolean);
+    }).catch(function () { return []; });
+  })).then(flat);
+}
+function mergeRes(lists) {
+  var seen = {}, out = [];
+  flat(lists).forEach(function (r) {
+    var k = r.date + "|" + [ln(r.a), ln(r.b)].sort().join("|"), o = seen[k];
+    if (!o) { seen[k] = r; out.push(r); return; }
+    if (!o.w && r.w) o.w = r.w === "draw" ? "draw" : ln(r.w === "a" ? r.a : r.b) === ln(o.a) ? "a" : "b";
+    ["method", "round", "time", "title"].forEach(function (f) { if (!o[f] && r[f]) o[f] = r[f]; });
+    if (o.src.indexOf(r.src) < 0) o.src += " · " + r.src;
+  });
+  return out;
+}
+function mockRes() {
+  var d = function (n) { var x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+  return [
+    { sport: "mma", org: "UFC", event: "Démo MMA", date: d(-3), a: "Marc Duval", b: "Karim Benali", w: "a", method: "KO/TKO", round: 2, time: "3:41", src: "Démo" },
+    { sport: "mma", org: "KSW", event: "Démo MMA", date: d(-9), a: "Lucas Moreau", b: "Piotr Nowak", w: "b", method: "Soumission", round: 1, time: "2:10", src: "Démo" },
+    { sport: "boxe", org: "Matchroom", event: "Démo Boxe", date: d(-4), a: "Tom Hayes", b: "Yan Petrov", w: "a", method: "Décision unanime", round: 12, src: "Démo" },
+    { sport: "boxe", org: "Top Rank", event: "Démo Boxe", date: d(-12), a: "Omar Diaz", b: "Ben Carter", w: "draw", method: "Match nul", round: 10, src: "Démo" }
+  ];
+}
+function loadResults() {
+  if (S.rl) return; S.rl = 1; S.rs = "loading"; $("#btnRefresh").classList.add("spin");
+  Promise.all([dbRes(), espnRes(), tsdbRes()]).then(function (l) {
+    var r = mergeRes(l); S.rOff = !r.length; if (S.rOff) r = mockRes();
+    r.sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
+    S.results = r; S.rs = "ok";
+  }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "res") render(); });
+}
+function methodTxt(r) {
+  if (r.w === "draw") return "Match nul";
+  var t = []; if (r.method) t.push(r.method); if (r.round) t.push("Round " + r.round); if (r.time) t.push(r.time);
+  return t.join(" · ") || "Résultat non communiqué";
+}
+function resHTML(r, i) {
+  var d = dateOf(r.date), a = r.w === "a", b = r.w === "b";
+  return '<article class="card res" style="--i:' + Math.min(i, 8) + '"><div class="head"><div class="who"><div class="date">' + esc(dFmt.dow.format(d)) + "<b>" + esc(dFmt.day.format(d)) + "</b>" + esc(dFmt.mon.format(d)) + "</div>" +
+    '<div class="info"><div class="org">' + esc(r.org) + "</div>" + (r.event ? '<div class="evt">' + esc(r.event) + "</div>" : "") + '</div></div><span class="sport">Terminé</span></div>' +
+    '<div class="vs"><span class="n' + (a ? " w" : "") + '">' + esc(r.a) + '</span><span class="x">VS</span><span class="n' + (b ? " w" : "") + '">' + esc(r.b) + "</span></div>" +
+    '<div class="verdict">' + (r.w === "a" || r.w === "b" ? "Victoire " + esc(r.w === "a" ? r.a : r.b) : r.w === "draw" ? "Match nul" : "Résultat") + "<small>" + esc(methodTxt(r)) + (r.title ? " · " + esc(r.title) : "") + "</small></div>" +
+    '<div class="srcl">Source : ' + esc(r.src) + "</div></article>";
+}
+
+/* --- Actus : agrégation de flux RSS (proxy rss2json, repli allorigins) --- */
+var G = "https://news.google.com/rss/search?hl=fr&gl=FR&ceid=FR:fr&q=";
+var FEEDS = [
+  ["Google Actus", G + "MMA+UFC", "mma", "fr"], ["Google Actus", G + "boxe+championnat+du+monde", "boxe", "fr"], ["Google Actus", G + "PFL+OR+KSW+OR+ARES+MMA", "mma", "fr"],
+  ["MMA Fighting", "https://www.mmafighting.com/rss/current", "mma", "en"], ["MMA Junkie", "https://mmajunkie.usatoday.com/feed", "mma", "en"],
+  ["Cageside Press", "https://cagesidepress.com/feed/", "mma", "en"], ["ESPN MMA", "https://www.espn.com/espn/rss/mma/news", "mma", "en"],
+  ["ESPN Boxing", "https://www.espn.com/espn/rss/boxing/news", "boxe", "en"], ["BBC Sport Boxing", "https://feeds.bbci.co.uk/sport/boxing/rss.xml", "boxe", "en"]
+];
+function feed(F) {
+  var u = encodeURIComponent(F[1]);
+  return jget("https://api.rss2json.com/v1/api.json?rss_url=" + u).then(function (j) {
+    if (j.status !== "ok") throw new Error("rss");
+    return j.items.map(function (i) { return { t: i.title, l: i.link, d: Date.parse(String(i.pubDate).replace(" ", "T") + "Z"), s: F[0], sp: F[2], lg: F[3] }; });
+  }).catch(function () {
+    return get("https://api.allorigins.win/raw?url=" + u).then(function (x) {
+      var doc = new DOMParser().parseFromString(x, "text/xml");
+      return [].map.call(doc.querySelectorAll("item,entry"), function (i) {
+        var g = function (n) { var e = i.querySelector(n); return e ? e.textContent : ""; }, lk = i.querySelector("link");
+        return { t: g("title"), l: g("link") || (lk && lk.getAttribute("href")), d: Date.parse(g("pubDate") || g("published") || g("updated")), s: F[0], sp: F[2], lg: F[3] };
+      });
+    }).catch(function () { return []; });
+  }).then(function (items) {
+    return items.map(function (n) {
+      var m = F[0] === "Google Actus" && String(n.t).match(/^(.*) - ([^-]+)$/); if (m) { n.t = m[1]; n.s = m[2]; } return n;
+    });
+  });
+}
+function loadNews() {
+  if (S.nl) return; S.nl = 1; S.ns = "loading"; $("#btnRefresh").classList.add("spin");
+  Promise.all(FEEDS.map(feed)).then(function (l) {
+    var seen = {}, out = flat(l).filter(function (n) { var k = plain(n.t || "").slice(0, 60); if (!n.t || !n.l || !n.d || seen[k]) return false; seen[k] = 1; return true; });
+    out.sort(function (x, y) { return y.d - x.d; });
+    if (out.length) { S.news = out.slice(0, 80); store("nvz-news", JSON.stringify(S.news)); }
+    else { try { S.news = JSON.parse(store("nvz-news") || "[]"); } catch (e) {} S.nOff = true; }
+    S.ns = "ok";
+  }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "news") render(); });
+}
+function newsHTML(n, i) {
+  return '<a class="card nw" style="--i:' + Math.min(i, 8) + '" href="' + esc(safeUrl(n.l)) + '" target="_blank" rel="noopener noreferrer"><div class="nm"><span class="sport">' + esc(sportLabel(n.sp)) + "</span><span>" + esc(n.s) + " · " + relative(n.d) + "</span></div><h3>" + esc(n.t) + "</h3></a>";
+}
+
+/* --- Affichage des vues --- */
+function renderViews() {
+  $("#views").innerHTML = VIEWS.map(function (v) { return '<button class="vw" type="button" data-act="view" data-v="' + v[0] + '" aria-pressed="' + (S.view === v[0]) + '">' + v[1] + "</button>"; }).join("");
+}
+function chipsOf(act, list, cur) {
+  return list.map(function (c) { return '<button class="chip" type="button" data-act="' + act + '" data-v="' + c[0] + '" aria-pressed="' + (cur === c[0]) + '">' + c[1] + "</button>"; }).join("");
+}
+function renderOther() {
+  $("#tabs").hidden = true; $("#btnSearch").hidden = true;
+  var html = "", foot = "", ring = '<div class="load"><div class="ring" role="status" aria-label="Chargement"></div></div>';
+  if (S.view === "res") {
+    $("#chips").innerHTML = chipsOf("rsport", [["mma", "MMA"], ["boxe", "Boxe"]], S.rsport);
+    if (S.rs === "idle") loadResults();
+    if (S.rs !== "ok") html = ring;
+    else {
+      var list = S.results.filter(function (r) { return (String(r.sport).toLowerCase() === "boxe") === (S.rsport === "boxe"); });
+      if (!list.length) html = emptyHTML("Aucun résultat", "Aucun combat terminé trouvé pour cette catégorie.", true);
+      else {
+        var groups = [], idx = {};
+        list.forEach(function (r) { var k = r.date.slice(0, 7); if (!(k in idx)) { idx[k] = groups.length; groups.push([k, []]); } groups[idx[k]][1].push(r); });
+        groups.forEach(function (g) {
+          var l = dFmt.month.format(dateOf(g[0] + "-01")); l = l.charAt(0).toUpperCase() + l.slice(1);
+          html += '<section><div class="month"><h2>' + esc(l) + "</h2><span>" + g[1].length + " combat" + (g[1].length > 1 ? "s" : "") + '</span></div><div class="list">' + g[1].map(resHTML).join("") + "</div></section>";
+        });
+      }
+      if (S.rOff) foot += "<p>Sources injoignables : données de démonstration affichées.</p>";
+    }
+    foot += "<p>Résultats compilés depuis plusieurs sources (base NVZCombat, ESPN, TheSportsDB) sur les 2 derniers mois. Le kick-boxing est regroupé avec le MMA.</p>";
+  } else {
+    $("#chips").innerHTML = chipsOf("nf", [["all", "Tout"], ["mma", "MMA"], ["boxe", "Boxe"], ["fr", "🇫🇷 En français"]], S.nf);
+    if (S.ns === "idle") loadNews();
+    if (S.ns !== "ok") html = ring;
+    else {
+      var items = S.news.filter(function (n) { return S.nf === "all" || (S.nf === "fr" ? n.lg === "fr" : n.sp === S.nf); });
+      html = items.length ? '<div class="list" style="margin-top:20px">' + items.map(newsHTML).join("") + "</div>" : emptyHTML("Aucune actu", "Impossible de récupérer les flux pour le moment.", true);
+      if (S.nOff) foot += "<p>Flux injoignables : dernières actus enregistrées.</p>";
+    }
+    var names = []; FEEDS.forEach(function (f) { if (names.indexOf(f[0]) < 0) names.push(f[0]); });
+    foot += "<p>Sources : " + esc(names.join(", ")) + ". Les articles s’ouvrent sur le site de l’éditeur.</p>";
+  }
+  $("#main").innerHTML = html; $("#footer").innerHTML = foot;
+}
+
+/* --- Calendrier : .ics (avec rappel optionnel) ou Google Agenda --- */
+function calBtn(f) {
+  var ok = calSet[f.id];
+  return '<button class="calb' + (ok ? " ok" : "") + '" type="button" data-act="cal" data-id="' + esc(f.id) + '">' + icon("cal") + (ok ? "Dans mon agenda" : "Ajouter à mon agenda") + "</button>";
+}
+function parisUtc(iso, t) {
+  var p = iso.split("-").map(Number), h = 0, m = 0, q = t && t.match(/(\d{1,2})\D(\d{2})/); if (q) { h = +q[1]; m = +q[2]; }
+  var g = Date.UTC(p[0], p[1] - 1, p[2], h, m), o = {};
+  new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric" })
+    .formatToParts(new Date(g)).forEach(function (x) { o[x.type] = +x.value; });
+  return g - (Date.UTC(o.year, o.month - 1, o.day, o.hour, o.minute) - g);
+}
+function stamp(ms) { return new Date(ms).toISOString().replace(/[-:]|\.\d{3}/g, ""); }
+function calTimes(f) {
+  if (!f.time) { var p = f.date.split("-").map(Number); return { all: true, s: f.date.replace(/-/g, ""), e: new Date(Date.UTC(p[0], p[1] - 1, p[2] + 1)).toISOString().slice(0, 10).replace(/-/g, "") }; }
+  var s = parisUtc(f.date, f.time); return { all: false, s: stamp(s), e: stamp(s + 3 * 3600000) };
+}
+function icsEsc(s) { return String(s).replace(/\\/g, "\\\\").replace(/[,;]/g, "\\$&").replace(/\n/g, "\\n"); }
+function calInfo(f) {
+  var title = f.a + " vs " + f.b + " (" + (f.org || sportLabel(f.sport)) + ")";
+  var desc = [f.event, f.title, f.tv.length ? "À voir sur : " + f.tv.join(", ") : "", f.time ? "" : "Heure à confirmer"].filter(Boolean).join(" — ");
+  return { title: title, desc: desc };
+}
+function makeICS(f, rem, min) {
+  var t = calTimes(f), i = calInfo(f), L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//NVZCombat//FR", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
+    "UID:" + String(f.id).replace(/\s/g, "") + "@nvzcombat", "DTSTAMP:" + stamp(Date.now()),
+    t.all ? "DTSTART;VALUE=DATE:" + t.s : "DTSTART:" + t.s, t.all ? "DTEND;VALUE=DATE:" + t.e : "DTEND:" + t.e,
+    "SUMMARY:" + icsEsc(i.title), "DESCRIPTION:" + icsEsc(i.desc)];
+  if (f.loc) L.push("LOCATION:" + icsEsc(f.loc));
+  if (rem) L.push("BEGIN:VALARM", "TRIGGER:-PT" + min + "M", "ACTION:DISPLAY", "DESCRIPTION:" + icsEsc("Bientôt : " + i.title), "END:VALARM");
+  L.push("END:VEVENT", "END:VCALENDAR"); return L.join("\r\n");
+}
+function calHTML() {
+  var f = S.cal.f, r = S.cal.rem, mins = [[15, "15 min"], [60, "1 h"], [180, "3 h"], [1440, "1 jour"]];
+  return "<h2>Ne ratez pas ce combat</h2>" +
+    '<p class="dm"><b style="color:var(--fg)">' + esc(f.a) + " vs " + esc(f.b) + "</b><br>" + esc(dFmt.long.format(dateOf(f.date))) + (f.time ? " · " + esc(f.time) + " (heure de Paris)" : " · heure à confirmer (journée entière)") + "</p>" +
+    "<h3>Voulez-vous un rappel ?</h3>" +
+    '<div class="seg"><button type="button" data-act="calrem" data-v="1" aria-pressed="' + r + '">Oui, me prévenir</button><button type="button" data-act="calrem" data-v="0" aria-pressed="' + !r + '">Non merci</button></div>' +
+    (r ? '<p class="dm">Me prévenir avant le début :</p><div class="seg">' + mins.map(function (m) { return '<button type="button" data-act="calmin" data-v="' + m[0] + '" aria-pressed="' + (S.cal.min === m[0]) + '">' + m[1] + "</button>"; }).join("") + "</div>" : "") +
+    '<div class="acts"><button class="btn p" type="button" data-act="calics">Ajouter à l’agenda (.ics)</button><button class="btn" type="button" data-act="calg">Google Agenda</button></div>' +
+    '<p class="dm sm">Le fichier .ics fonctionne avec Apple Calendrier, Outlook et Android.' + (r ? " Google Agenda applique vos rappels par défaut." : "") + "</p>" +
+    '<button class="cancel" type="button" data-act="calx" style="margin-top:8px">Fermer</button>';
+}
+function calOpen(on) {
+  $("#calScrim").hidden = !on;
+  if (on) { $("#calBox").innerHTML = calHTML(); var b = $("#calBox .btn.p"); if (b) b.focus(); }
+}
+function calDone() { calSet[S.cal.f.id] = 1; store("nvz-cal", JSON.stringify(calSet)); calOpen(false); render(); }
+document.addEventListener("click", function (e) {
+  if (e.target === $("#calScrim")) return calOpen(false);
+  var el = e.target.closest("[data-act]"); if (!el) return;
+  var act = el.getAttribute("data-act"), v = el.getAttribute("data-v");
+  if (act === "view") { if (S.searching) setSearch(false); S.view = v; render(); var h = $(".hero").offsetHeight; if (window.scrollY > h) window.scrollTo({ top: h }); }
+  else if (act === "rsport") { S.rsport = v; render(); }
+  else if (act === "nf") { S.nf = v; render(); }
+  else if (act === "cal") { var id = el.getAttribute("data-id"); var f = S.fights.filter(function (x) { return String(x.id) === id; })[0]; if (f) { S.cal = { f: f, rem: true, min: 60 }; calOpen(true); } }
+  else if (act === "calrem") { S.cal.rem = v === "1"; calOpen(true); }
+  else if (act === "calmin") { S.cal.min = +v; calOpen(true); }
+  else if (act === "calx") calOpen(false);
+  else if (act === "calics") {
+    var f2 = S.cal.f, url = URL.createObjectURL(new Blob([makeICS(f2, S.cal.rem, S.cal.min)], { type: "text/calendar;charset=utf-8" })), a = document.createElement("a");
+    a.href = url; a.download = "nvz-" + plain(f2.a + "-" + f2.b).replace(/[^a-z0-9]+/g, "-") + ".ics"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000); calDone();
+  } else if (act === "calg") {
+    var f3 = S.cal.f, t = calTimes(f3), i = calInfo(f3);
+    window.open("https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(i.title) + "&dates=" + t.s + "/" + t.e + "&details=" + encodeURIComponent(i.desc) + "&location=" + encodeURIComponent(f3.loc || ""), "_blank", "noopener"); calDone();
+  }
+});
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#calScrim").hidden) calOpen(false); });
 
 /* Démarrage & Initialisation */
 window.onload = function() {
