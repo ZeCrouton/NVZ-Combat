@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0D0908">
+<meta name="description" content="NVZ Combat : les prochains combats de MMA, boxe et kickboxing classés par hype, avec les diffuseurs en France, les résultats, les actus et les classements UFC.">
+<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="NVZ Combat">
+<meta property="og:title" content="NVZ Combat — Guide des combats MMA &amp; Boxe">
+<meta property="og:description" content="Les prochains combats de MMA, boxe et kickboxing classés par hype, avec les diffuseurs en France.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NVZ Combat"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>NVZCombat — Guide des Combats MMA & Boxe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,7 +167,7 @@ footer p { margin: 0 0 6px; }
 @media (prefers-reduced-motion: reduce) { .card { animation: none; } .ring, .ib.spin svg { animation-duration: 3s; } }
 
 /* ---- vues, résultats, actus, calendrier */
-.views{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:3px;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:10px}
+.views{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:3px;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:10px}
 .vw{border:0;background:transparent;border-radius:8px;padding:8px 4px;font:700 14px/1.2 var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);transition:all .2s}
 .vw[aria-pressed="true"]{background:var(--primary);color:var(--primary-fg)}
 .res .vs .n{opacity:.55}.res .vs .n.w{opacity:1;color:var(--fg)}
@@ -182,6 +193,24 @@ footer p { margin: 0 0 6px; }
 .acts{display:grid;gap:8px;margin-top:20px}
 .btn{padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-weight:600}
 .btn.p{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+
+/* ---- fight card & classement */
+.fcl{display:grid;gap:6px;margin-top:12px}.fcr{display:grid;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:var(--surface);font-weight:600}
+.fcr i{font-style:normal;color:var(--primary)}.fcr small{color:var(--muted);font-weight:400}.fcr.on{border-color:var(--primary)}
+.rkh h2,.rkt2{font:400 34px/1 var(--display);letter-spacing:.02em;text-transform:uppercase;margin:16px 0 8px}
+.rkb{border:0;background:none;color:var(--muted);padding:14px 0 0;font-weight:500}
+.rkm,.rkr{display:grid;gap:4px;width:100%;text-align:left;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--fg)}
+.rkm b{font:400 30px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}.rkm span,.rkr small,.rkf small{font-size:13px;color:var(--muted)}
+.rkm:hover,.rkd:hover,.rkf:hover{border-color:var(--primary)}
+.rks{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:999px;padding:0 14px;background:var(--surface);margin:8px 0 14px}
+.rks input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--fg);font:inherit;padding:11px 0}
+.rkg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.rkd{padding:14px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font:700 15px/1.2 var(--cond);letter-spacing:.04em;text-transform:uppercase}
+.rkt{font:600 14px var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.rkf{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--fg)}
+.rkf span{font:400 22px var(--display);color:var(--primary);min-width:34px}.rkf b{flex:1}
+.rkr{grid-template-columns:40px 1fr;align-items:center;gap:0 12px}.rkr .rn{font:400 28px/1 var(--display);color:var(--primary);text-align:center;grid-row:span 2}
+.rkr.ch .rn{color:var(--star)}.rkr small{grid-column:2}
 </style>
 </head>
 <body>
@@ -227,6 +256,7 @@ footer p { margin: 0 0 6px; }
 </div>
 
 <div class="scrim c" id="calScrim" hidden><div class="dlg" id="calBox" role="dialog" aria-modal="true"></div></div>
+<div class="scrim c" id="fcScrim" hidden><div class="dlg" id="fcBox" role="dialog" aria-modal="true"></div></div>
 
 <script>
 "use strict";
@@ -248,83 +278,6 @@ var ICONS = {
   trophy: '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>',
   pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'
 };
-
-/* Jeu de données réaliste de secours (Mock Data) si le serveur Supabase ne réponds pas */
-function getMockFights() {
-  var today = new Date();
-  function getDateIso(daysOffset) {
-    var d = new Date(today);
-    d.setDate(d.getDate() + daysOffset);
-    return d.toISOString().slice(0, 10);
-  }
-
-  return [
-    {
-      id: "mock-1", sport: "mma", organization: "UFC", event_name: "UFC 312",
-      event_date: getDateIso(5), start_time_paris: "04:00", location: "Sydney, Australie",
-      fighter_a: "Jon Jones", fighter_b: "Tom Aspinall", weight_class: "Poids Lourds",
-      title: "Ceinture Poids Lourds UFC", card_position: "main", french_involved: false,
-      hype_score: 98, hype_reason: "Le choc au sommet le plus attendu pour l'unification de la ceinture des lointains lourds.",
-      tier: "star", broadcasters: ["RMC Sport 1"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-2", sport: "mma", organization: "UFC", event_name: "UFC Fight Night",
-      event_date: getDateIso(12), start_time_paris: "21:00", location: "Accor Arena, Paris, France",
-      fighter_a: "Benoît Saint-Denis", fighter_b: "Dan Hooker", weight_class: "Poids Légers",
-      title: null, card_position: "main", french_involved: true,
-      hype_score: 94, hype_reason: "BSD de retour à Paris pour un duel explosif vers le top 5 mondial !",
-      tier: "star", broadcasters: ["RMC Sport 1", "Twitch RMC Sport"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-3", sport: "mma", organization: "KSW", event_name: "KSW 101",
-      event_date: getDateIso(18), start_time_paris: "20:30", location: "Paris, France",
-      fighter_a: "Salahdine Parnasse", fighter_b: "Marian Ziółkowski", weight_class: "Poids Légers",
-      title: "Ceinture Poids Légers KSW", card_position: "main", french_involved: true,
-      hype_score: 91, hype_reason: "Parnasse défend son titre à domicile dans une ambiance survoltée.",
-      tier: "star", broadcasters: ["RMC Sport 2"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-4", sport: "boxe", organization: "Matchroom", event_name: "Championship Night",
-      event_date: getDateIso(25), start_time_paris: "22:00", location: "Wembley Stadium, Londres",
-      fighter_a: "Anthony Joshua", fighter_b: "Tyson Fury", weight_class: "Poids Lourds",
-      title: "Championnat du Monde Unifié", card_position: "main", french_involved: false,
-      hype_score: 96, hype_reason: "La bataille d'Angleterre tant espérée pour l'histoire de la boxe poids lourds.",
-      tier: "star", broadcasters: ["DAZN"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-5", sport: "mma", organization: "ARES FC", event_name: "ARES 28",
-      event_date: getDateIso(32), start_time_paris: "19:30", location: "Dôme de Paris, France",
-      fighter_a: "Baysangur Chamsoudinov", fighter_b: "Felix Klinkhammer", weight_class: "Poids Mi-Moyens",
-      title: "Ceinture Welterweight ARES", card_position: "main", french_involved: true,
-      hype_score: 85, hype_reason: "Baki poursuit sa montée fulgurante vers les sommets.",
-      tier: "important", broadcasters: ["Canal+ Sport 360", "UFC Fight Pass"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-6", sport: "boxe", organization: "Top Rank", event_name: "Las Vegas Showdown",
-      event_date: getDateIso(40), start_time_paris: "03:00", location: "MGM Grand, Las Vegas",
-      fighter_a: "Naoya Inoue", fighter_b: "Murodjon Akhmadaliev", weight_class: "Poids Super-Coqs",
-      title: "Unification Indiscutée", card_position: "main", french_involved: false,
-      hype_score: 89, hype_reason: "Le monstre japonais défend ses 4 ceintures face à son challenger obligatoire.",
-      tier: "important", broadcasters: ["RMC Sport 1"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-7", sport: "mma", organization: "PFL", event_name: "PFL Europe 1",
-      event_date: getDateIso(48), start_time_paris: "19:00", location: "Nantes, France",
-      fighter_a: "Cédric Doumbé", fighter_b: "Anthony Taylor", weight_class: "Poids Mi-Moyens",
-      title: null, card_position: "main", french_involved: true,
-      hype_score: 87, hype_reason: "Show garanti pour le retour de Doumbé dans la cage du PFL.",
-      tier: "important", broadcasters: ["DAZN France"], last_seen_at: new Date().toISOString()
-    },
-    {
-      id: "mock-8", sport: "kickboxing", organization: "GLORY", event_name: "GLORY 95",
-      event_date: getDateIso(55), start_time_paris: "21:00", location: "GelreDome, Arnhem",
-      fighter_a: "Rico Verhoeven", fighter_b: "Levi Rigters", weight_class: "Poids Lourds",
-      title: "Ceinture Poids Lourds GLORY", card_position: "main", french_involved: false,
-      hype_score: 79, hype_reason: "Le roi du Kick-boxing remet sa couronne en jeu.",
-      tier: "autre", broadcasters: ["DAZN"], last_seen_at: new Date().toISOString()
-    }
-  ];
-}
 
 function icon(name) { return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>'; }
 
@@ -419,10 +372,8 @@ function load(manual) {
         if (list.length) { S.fights = list; S.status = "ok"; S.offline = true; return; }
       } catch (e) {}
     }
-    // Fallback Mock Data
-    S.fights = parse(getMockFights());
-    S.status = "ok";
-    S.offline = true;
+    // Aucune donnée disponible : on n'invente rien
+    if (S.fights.length) S.offline = true; else S.status = "failed";
   }).then(function () {
     S.loading = false; $("#btnRefresh").classList.remove("spin"); render();
   });
@@ -454,7 +405,7 @@ function cardHTML(f, i) {
     (pills ? '<div class="pills">' + pills + "</div>" : "") +
     '<div class="hype"><div class="l"><span>Hype</span><b>' + f.hype + '/100</b></div><div class="meter"><i style="width:' + f.hype + '%"></i></div>' +
     (f.why ? '<p class="why">' + esc(f.why) + "</p>" : "") + "</div>" +
-    '<div class="foot"><div class="tv">' + icon("tv") + tv + "</div>" + (f.loc ? '<div class="loc">' + icon("pin") + esc(f.loc) + "</div>" : "") + calBtn(f) + "</div></article>";
+    '<div class="foot"><div class="tv">' + icon("tv") + tv + "</div>" + (f.loc ? '<div class="loc">' + icon("pin") + esc(f.loc) + "</div>" : "") + calBtn(f) + fcBtn(f) + "</div></article>";
 }
 
 function emptyHTML(title, text, retry) {
@@ -521,7 +472,7 @@ function render() {
   var seen = fights.map(function (f) { return f.seen; }).filter(Boolean);
   var foot = "";
   if (seen.length) foot += "<p>Liste mise à jour automatiquement — dernière mise à jour " + relative(Math.max.apply(null, seen)) + ".</p>";
-  if (S.offline) foot += "<p>Mode déconnecté / Données de démonstration : les dernières informations enregistrées sont affichées.</p>";
+  if (S.offline) foot += "<p>Mode hors-ligne : les dernières informations enregistrées sont affichées.</p>";
   foot += "<p>Les combats plus lointains apparaissent dès leur annonce officielle. Infos compilées depuis le web : dates, horaires et diffuseurs peuvent changer. Vérifiez auprès du diffuseur avant le combat.</p>";
   $("#footer").innerHTML = foot;
 }
@@ -548,7 +499,7 @@ $("#btnSearch").addEventListener("click", function () { setSearch(true); });
 $("#btnCancel").addEventListener("click", function () { setSearch(false); });
 $("#q").addEventListener("input", function (e) { S.q = e.target.value; render(); });
 $("#q").addEventListener("keydown", function (e) { if (e.key === "Escape") setSearch(false); });
-$("#btnRefresh").addEventListener("click", function () { if (S.view === "res") { S.rl = 0; loadResults(); } else if (S.view === "news") { S.nl = 0; loadNews(); } else load(true); });
+$("#btnRefresh").addEventListener("click", function () { if (S.view === "res") { S.rl = 0; loadResults(); } else if (S.view === "news") { S.nl = 0; loadNews(); } else if (S.view === "rank") rkReset(); else load(true); });
 
 /* Gestion des Thèmes & Personnalisation */
 function applyTheme(dark, accentIndex) {
@@ -570,7 +521,7 @@ $("#scrim").addEventListener("click", function (e) { if (e.target === $("#scrim"
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#scrim").hidden) openPanel(false); });
 
 /* ===== Vues : Résultats, Actus, Calendrier ===== */
-var VIEWS = [["prog", "À venir"], ["res", "Résultats"], ["news", "Actus"]];
+var VIEWS = [["prog", "À venir"], ["res", "Résultats"], ["news", "Actus"], ["rank", "Classement"]];
 S.view = "prog"; S.rsport = "mma"; S.nf = "all"; S.results = []; S.news = []; S.rs = "idle"; S.ns = "idle"; S.cal = null;
 ICONS.cal = '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/>';
 var calSet = {}; try { calSet = JSON.parse(store("nvz-cal") || "{}"); } catch (e) {}
@@ -636,19 +587,10 @@ function mergeRes(lists) {
   });
   return out;
 }
-function mockRes() {
-  var d = function (n) { var x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
-  return [
-    { sport: "mma", org: "UFC", event: "Démo MMA", date: d(-3), a: "Marc Duval", b: "Karim Benali", w: "a", method: "KO/TKO", round: 2, time: "3:41", src: "Démo" },
-    { sport: "mma", org: "KSW", event: "Démo MMA", date: d(-9), a: "Lucas Moreau", b: "Piotr Nowak", w: "b", method: "Soumission", round: 1, time: "2:10", src: "Démo" },
-    { sport: "boxe", org: "Matchroom", event: "Démo Boxe", date: d(-4), a: "Tom Hayes", b: "Yan Petrov", w: "a", method: "Décision unanime", round: 12, src: "Démo" },
-    { sport: "boxe", org: "Top Rank", event: "Démo Boxe", date: d(-12), a: "Omar Diaz", b: "Ben Carter", w: "draw", method: "Match nul", round: 10, src: "Démo" }
-  ];
-}
 function loadResults() {
   if (S.rl) return; S.rl = 1; S.rs = "loading"; $("#btnRefresh").classList.add("spin");
   Promise.all([dbRes(), espnRes(), tsdbRes()]).then(function (l) {
-    var r = mergeRes(l); S.rOff = !r.length; if (S.rOff) r = mockRes();
+    var r = mergeRes(l); S.rOff = !r.length;
     r.sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
     S.results = r; S.rs = "ok";
   }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "res" || S.searching) render(); });
@@ -718,6 +660,7 @@ function chipsOf(act, list, cur) {
 }
 function renderOther() {
   $("#tabs").hidden = true; $("#btnSearch").hidden = S.view !== "res";
+  if (S.view === "rank") return renderRank();
   var html = "", foot = "", ring = '<div class="load"><div class="ring" role="status" aria-label="Chargement"></div></div>';
   if (S.view === "res") {
     $("#chips").innerHTML = chipsOf("rsport", [["mma", "MMA"], ["boxe", "Boxe"]], S.rsport);
@@ -740,7 +683,7 @@ function renderOther() {
           html += '<section><div class="month"><h2>' + esc(l) + "</h2><span>" + g[1].length + " combat" + (g[1].length > 1 ? "s" : "") + '</span></div><div class="list">' + g[1].map(resHTML).join("") + "</div></section>";
         });
       }
-      if (S.rOff) foot += "<p>Sources injoignables : données de démonstration affichées.</p>";
+      if (S.rOff) foot += "<p>Sources injoignables pour le moment.</p>";
     }
     foot += "<p>Résultats compilés depuis plusieurs sources (base NVZCombat, ESPN, TheSportsDB) sur les 2 derniers mois. Le kick-boxing est regroupé avec le MMA.</p>";
   } else {
@@ -828,12 +771,120 @@ document.addEventListener("click", function (e) {
 });
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#calScrim").hidden) calOpen(false); });
 
+/* ===== Fight card (ESPN) + Classement UFC ===== */
+ICONS.list = '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>';
+S.cards = []; S.rk = { mode: null, div: null, q: "", media: null, meta: null, st: {} };
+var WC_FR = { "heavyweight": "Poids lourds", "light heavyweight": "Mi-lourds", "middleweight": "Poids moyens", "welterweight": "Mi-moyens", "lightweight": "Poids légers", "featherweight": "Poids plumes", "bantamweight": "Poids coqs", "flyweight": "Poids mouches", "strawweight": "Poids pailles", "pound-for-pound": "Pound for pound", "pound for pound": "Pound for pound" };
+function frLabel(n) {
+  var s = String(n), w = /women/i.test(s), k = s.toLowerCase().replace(/women'?s\s*/, "").replace(/^men'?s\s*/, "").trim(), r = WC_FR[k];
+  return r ? r + (w ? " (F)" : /^men/i.test(s) ? " (H)" : "") : s;
+}
+var ESPN = "https://site.api.espn.com/apis/site/v2/sports/mma/";
+function ymd(iso) { return iso.replace(/-/g, ""); }
+
+/* --- Fight card : cartes complètes des soirées à venir (UFC, PFL) --- */
+function espnCards() {
+  var t = parisToday(), rng = ymd(t) + "-" + ymd(addMonths(t, WINDOW_MONTHS));
+  return Promise.all([["ufc", "UFC"], ["pfl", "PFL"]].map(function (L) {
+    return jget(ESPN + L[0] + "/scoreboard?limit=300&dates=" + rng).then(function (j) {
+      return (j.events || []).map(function (ev) {
+        var nm = function (x) { return (x.athlete && x.athlete.displayName) || ""; };
+        var bouts = (ev.competitions || []).map(function (c) {
+          var cs = c.competitors || []; if (cs.length < 2 || !nm(cs[0]) || !nm(cs[1])) return null;
+          return { a: nm(cs[0]), b: nm(cs[1]), wc: c.type ? (c.type.text || c.type.abbreviation || "") : "", d: String(c.date || ev.date) };
+        }).filter(Boolean);
+        bouts.sort(function (x, y) { return x.d < y.d ? 1 : x.d > y.d ? -1 : 0; }); /* le plus tardif (main event) en haut */
+        return { org: L[1], name: ev.name || "", date: String(ev.date).slice(0, 10), bouts: bouts };
+      });
+    }).catch(function () { return []; });
+  })).then(flat);
+}
+function sameBout(x, a, b) { var p = ln(x.a), q = ln(x.b); return (p === a && q === b) || (p === b && q === a); }
+function findCard(f) {
+  var a = ln(f.a), b = ln(f.b);
+  for (var i = 0; i < S.cards.length; i++) {
+    var c = S.cards[i]; if (c.bouts.length < 2) continue;
+    for (var j = 0; j < c.bouts.length; j++) if (sameBout(c.bouts[j], a, b)) return c;
+  }
+  return null;
+}
+function fcBtn(f) { return findCard(f) ? '<button class="calb" type="button" data-act="fc" data-id="' + esc(f.id) + '">' + icon("list") + "Fight card</button>" : ""; }
+function fcOpen(f) {
+  $("#fcScrim").hidden = !f; if (!f) return;
+  var c = findCard(f), a = ln(f.a), b = ln(f.b);
+  $("#fcBox").innerHTML = "<h2>" + esc(c.name) + '</h2><p class="dm">' + esc(dFmt.long.format(dateOf(c.date))) + " · " + c.bouts.length + " combats</p><div class=\"fcl\">" +
+    c.bouts.map(function (x) {
+      return '<div class="fcr' + (sameBout(x, a, b) ? " on" : "") + '"><span>' + esc(x.a) + " <i>vs</i> " + esc(x.b) + "</span>" + (x.wc ? "<small>" + esc(frLabel(x.wc)) + "</small>" : "") + "</div>";
+    }).join("") + '</div><p class="dm sm">Source : ESPN. La carte peut changer jusqu\u2019à la pesée.</p><button class="cancel" type="button" data-act="fcx" style="margin-top:8px">Fermer</button>';
+}
+
+/* --- Classement UFC : Media = vote des médias, Meta = algorithme UFC (data/rankings.json, mis à jour par GitHub Actions) --- */
+function loadRank() {
+  S.rk.st.media = S.rk.st.meta = "loading";
+  jget("data/rankings.json").then(function (j) {
+    S.rk.media = j.media || []; S.rk.meta = j.meta || []; S.rk.src = j.src || null;
+    S.rk.st.media = S.rk.media.length ? "ok" : "fail"; S.rk.st.meta = S.rk.meta.length ? "ok" : "fail";
+  }).catch(function () { S.rk.st.media = S.rk.st.meta = "fail"; }).then(renderRank);
+}
+function divBtn(x) { return '<button class="rkd" type="button" data-act="rkdiv" data-v="' + x.i + '">' + esc(frLabel(x.d.name)) + "</button>"; }
+function rkListHTML() {
+  var K = S.rk, divs = (K[K.mode] || []).map(function (d, i) { return { i: i, d: d }; }), q = plain(K.q).trim();
+  if (!q) return '<div class="rkg">' + divs.map(divBtn).join("") + "</div>";
+  var terms = q.split(/\s+/), has = function (s) { s = plain(s); return terms.every(function (t) { return s.indexOf(t) >= 0; }); };
+  var bd = divs.filter(function (x) { return has(frLabel(x.d.name) + " " + x.d.name); }), out = bd.length ? '<div class="rkg">' + bd.map(divBtn).join("") + "</div>" : "", fh = [];
+  divs.forEach(function (x) { x.d.list.forEach(function (p) { if (has(p.name)) fh.push({ i: x.i, p: p, d: x.d }); }); });
+  if (fh.length) out += '<h3 class="rkt">Combattants</h3><div class="list">' + fh.slice(0, 20).map(function (h) {
+    return '<button class="rkf" type="button" data-act="rkdiv" data-v="' + h.i + '"><span>' + (h.p.rank === 0 ? "C" : "#" + h.p.rank) + "</span><b>" + esc(h.p.name) + "</b><small>" + esc(frLabel(h.d.name)) + "</small></button>";
+  }).join("") + "</div>";
+  return out || emptyHTML("Aucun résultat", "Rien ne correspond à « " + K.q.trim() + " ».");
+}
+function renderRank() {
+  if (S.view !== "rank") return;
+  var K = S.rk, html = "", foot = "", st = K.mode && K.st[K.mode];
+  $("#chips").innerHTML = "";
+  if (!K.mode) {
+    html = '<div class="rkh"><h2>Classement UFC</h2><p class="dm">Quel classement veux-tu voir ?</p></div><div class="list">' +
+      '<button class="rkm" type="button" data-act="rkmode" data-v="media"><b>Media ranking</b><span>Le classement historique de l\u2019UFC, voté par un panel de médias.</span></button>' +
+      '<button class="rkm" type="button" data-act="rkmode" data-v="meta"><b>Meta ranking</b><span>Le classement Meta de l\u2019UFC, calculé par algorithme (depuis juin 2026).</span></button></div>';
+  } else {
+    if (!st) { loadRank(); st = "loading"; }
+    html = '<button class="rkb" type="button" data-act="rkback">\u2039 ' + (K.div != null ? "Catégories" : "Choix du classement") + "</button>";
+    if (st === "loading") html += '<div class="load"><div class="ring" role="status" aria-label="Chargement"></div></div>';
+    else if (st === "fail") html += emptyHTML("Classement indisponible", "Les données n\u2019ont pas encore été générées ou sont injoignables.", true);
+    else if (K.div == null) html += '<h2 class="rkt2">' + (K.mode === "media" ? "Media ranking" : "Meta ranking") + '</h2><label class="rks"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="sr">Rechercher un classement ou un combattant</span><input id="rq" type="search" placeholder="Catégorie ou combattant…" autocomplete="off" value="' + esc(K.q) + '"></label><div id="rkList">' + rkListHTML() + "</div>";
+    else {
+      var d = K[K.mode][K.div];
+      html += '<h2 class="rkt2">' + esc(frLabel(d.name)) + '</h2><div class="list">' + d.list.map(function (p) {
+        return '<div class="rkr' + (p.rank === 0 ? " ch" : "") + '"><span class="rn">' + (p.rank === 0 ? "C" : p.rank) + "</span><b>" + esc(p.name) + "</b>" + (p.sub ? "<small>" + esc(p.sub) + "</small>" : "") + "</div>";
+      }).join("") + "</div>";
+    }
+    foot = (K.mode === "media" ? "<p>Media ranking : classement UFC voté par un panel de médias.</p>" : "<p>Meta ranking : classement automatique de l\u2019UFC, calculé à partir des résultats et de l\u2019activité (champion en tête, top 15 par catégorie).</p>") + "<p>C = champion. Source : La Sueur (lasueur.com/classement-ufc)" + (K.src ? ", données du " + esc(K.src) : "") + ".</p>";
+  }
+  $("#main").innerHTML = html; $("#footer").innerHTML = foot;
+}
+function rkReset() { S.rk.media = S.rk.meta = null; S.rk.st = {}; renderRank(); }
+document.addEventListener("input", function (e) { if (e.target.id === "rq") { S.rk.q = e.target.value; $("#rkList").innerHTML = rkListHTML(); } });
+document.addEventListener("click", function (e) {
+  if (e.target === $("#fcScrim")) return fcOpen(null);
+  var el = e.target.closest("[data-act]"); if (!el) return;
+  var act = el.getAttribute("data-act"), v = el.getAttribute("data-v");
+  if (act === "fc") { var id = el.getAttribute("data-id"), f = S.fights.filter(function (x) { return String(x.id) === id; })[0]; if (f && findCard(f)) fcOpen(f); }
+  else if (act === "fcx") fcOpen(null);
+  else if (act === "rkmode") { S.rk.mode = v; S.rk.div = null; S.rk.q = ""; renderRank(); }
+  else if (act === "rkdiv") { S.rk.div = +v; renderRank(); window.scrollTo({ top: $(".hero").offsetHeight }); }
+  else if (act === "rkback") { if (S.rk.div != null) S.rk.div = null; else { S.rk.mode = null; S.rk.q = ""; } renderRank(); }
+  else if (act === "retry" && S.view === "rank") rkReset();
+});
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("#fcScrim").hidden) fcOpen(null); });
+
 /* Démarrage & Initialisation */
 window.onload = function() {
   $("#lead").textContent = "Les combats des " + WINDOW_MONTHS + " prochains mois, classés par la hype — et où les regarder en France.";
   applyTheme(prefs.dark, prefs.accent);
   render();
   load(false);
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
+  espnCards().then(function (c) { S.cards = c; if (S.view === "prog") render(); });
 };
 </script>
 </body>
