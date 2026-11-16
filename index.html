@@ -365,6 +365,7 @@ function parse(rows) {
     };
     var d = dateOf(f.date);
     f.key = withAliases(plain([a, b, f.org, f.event, sportLabel(f.sport), f.loc || "", f.tv.join(" "), f.weight || "", f.title || "", f.fr ? "francais" : "", dFmt.long.format(d), dFmt.short.format(d)].join(" ")));
+    f.kf = withAliases(plain(a + " " + b));
     out.push(f);
   });
   out.sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : y.hype - x.hype; });
@@ -476,10 +477,17 @@ function render() {
   var shown, resShown = [];
   if (searchOn) {
     var terms = plain(S.q).split(/\s+/).filter(Boolean);
-    shown = fights.filter(function (f) { return terms.every(function (t) { return f.key.indexOf(t) >= 0; }); });
     // La recherche renvoie aussi les combats terminés (résultats).
     if (S.rs === "idle") loadResults();
-    resShown = (S.results || []).filter(function (r) { return terms.every(function (t) { return resKey(r).indexOf(t) >= 0; }); });
+    var pick = function (kf, kr) {
+      return [fights.filter(function (f) { return terms.every(function (t) { return f[kf].indexOf(t) >= 0; }); }),
+        (S.results || []).filter(function (r) { return terms.every(function (t) { return kr(r).indexOf(t) >= 0; }); })];
+    };
+    // Priorité aux combattants : « Gane » ne renvoie que ses combats, pas toute la soirée.
+    // Si aucun combattant ne correspond, on élargit à l'événement, au lieu, au diffuseur…
+    var hit = pick("kf", resKF);
+    if (!hit[0].length && !hit[1].length) hit = pick("key", resKey);
+    shown = hit[0]; resShown = hit[1];
   } else shown = base.filter(function (f) { return f.tier === S.tier; });
 
   $("#tabs").innerHTML = TIERS.map(function (t) {
@@ -648,6 +656,7 @@ function loadResults() {
 function resKey(r) {
   return withAliases(plain([r.a, r.b, r.org, r.event, sportLabel(r.sport), r.title || "", r.method || "", dFmt.long.format(dateOf(r.date)), dFmt.short.format(dateOf(r.date))].join(" ")));
 }
+function resKF(r) { return withAliases(plain(r.a + " " + r.b)); }
 function methodTxt(r) {
   if (r.w === "draw") return "Match nul";
   var t = []; if (r.method) t.push(r.method); if (r.round) t.push("Round " + r.round); if (r.time) t.push(r.time);
@@ -719,8 +728,9 @@ function renderOther() {
     if (S.rs !== "ok") html = ring;
     else {
       var sTerms = S.searching && S.q.trim() !== "" ? plain(S.q).split(/\s+/).filter(Boolean) : null;
+      var byKey = function (kr) { return S.results.filter(function (r) { return sTerms.every(function (t) { return kr(r).indexOf(t) >= 0; }); }); };
       var list = sTerms
-        ? S.results.filter(function (r) { return sTerms.every(function (t) { return resKey(r).indexOf(t) >= 0; }); })
+        ? (byKey(resKF).length ? byKey(resKF) : byKey(resKey))
         : S.results.filter(function (r) { return (String(r.sport).toLowerCase() === "boxe") === (S.rsport === "boxe"); });
       if (!list.length) html = sTerms ? emptyHTML("Aucun résultat", "Aucun combat terminé ne correspond à « " + S.q.trim() + " ».")
         : emptyHTML("Aucun résultat", "Aucun combat terminé trouvé pour cette catégorie.", true);
