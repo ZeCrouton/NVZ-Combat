@@ -674,10 +674,7 @@ function resHTML(r, i) {
 /* --- Actus : agrégation de flux RSS (proxy rss2json, repli allorigins) --- */
 var G = "https://news.google.com/rss/search?hl=fr&gl=FR&ceid=FR:fr&q=";
 var FEEDS = [
-  ["Google Actus", G + "MMA+UFC", "mma", "fr"], ["Google Actus", G + "boxe+championnat+du+monde", "boxe", "fr"], ["Google Actus", G + "PFL+OR+KSW+OR+ARES+MMA", "mma", "fr"],
-  ["MMA Fighting", "https://www.mmafighting.com/rss/current", "mma", "en"], ["MMA Junkie", "https://mmajunkie.usatoday.com/feed", "mma", "en"],
-  ["Cageside Press", "https://cagesidepress.com/feed/", "mma", "en"], ["ESPN MMA", "https://www.espn.com/espn/rss/mma/news", "mma", "en"],
-  ["ESPN Boxing", "https://www.espn.com/espn/rss/boxing/news", "boxe", "en"], ["BBC Sport Boxing", "https://feeds.bbci.co.uk/sport/boxing/rss.xml", "boxe", "en"]
+  ["Google Actus", G + "MMA+UFC", "mma", "fr"], ["Google Actus", G + "boxe+championnat+du+monde", "boxe", "fr"], ["Google Actus", G + "PFL+OR+KSW+OR+ARES+MMA", "mma", "fr"]
 ];
 function feed(F) {
   var u = encodeURIComponent(F[1]);
