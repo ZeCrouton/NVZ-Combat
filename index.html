@@ -821,7 +821,8 @@ function fcOpen(f) {
 /* --- Classement UFC : Media = vote des médias, Meta = algorithme UFC (data/rankings.json, mis à jour par GitHub Actions) --- */
 function loadRank() {
   S.rk.st.media = S.rk.st.meta = "loading";
-  jget("data/rankings.json").then(function (j) {
+  /* cache:"no-store" : GitHub Pages met les fichiers en cache ~10 min, on évite de relire un ancien JSON vide */
+  fetch("data/rankings.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
     S.rk.media = j.media || []; S.rk.meta = j.meta || []; S.rk.src = j.src || null;
     S.rk.st.media = S.rk.media.length ? "ok" : "fail"; S.rk.st.meta = S.rk.meta.length ? "ok" : "fail";
   }).catch(function () { S.rk.st.media = S.rk.st.meta = "fail"; }).then(renderRank);
