@@ -708,16 +708,21 @@ function chipsOf(act, list, cur) {
   return list.map(function (c) { return '<button class="chip" type="button" data-act="' + act + '" data-v="' + c[0] + '" aria-pressed="' + (cur === c[0]) + '">' + c[1] + "</button>"; }).join("");
 }
 function renderOther() {
-  $("#tabs").hidden = true; $("#btnSearch").hidden = true;
+  $("#tabs").hidden = true; $("#btnSearch").hidden = S.view !== "res";
   var html = "", foot = "", ring = '<div class="load"><div class="ring" role="status" aria-label="Chargement"></div></div>';
   if (S.view === "res") {
     $("#chips").innerHTML = chipsOf("rsport", [["mma", "MMA"], ["boxe", "Boxe"]], S.rsport);
     if (S.rs === "idle") loadResults();
     if (S.rs !== "ok") html = ring;
     else {
-      var list = S.results.filter(function (r) { return (String(r.sport).toLowerCase() === "boxe") === (S.rsport === "boxe"); });
-      if (!list.length) html = emptyHTML("Aucun résultat", "Aucun combat terminé trouvé pour cette catégorie.", true);
+      var sTerms = S.searching && S.q.trim() !== "" ? plain(S.q).split(/\s+/).filter(Boolean) : null;
+      var list = sTerms
+        ? S.results.filter(function (r) { return sTerms.every(function (t) { return resKey(r).indexOf(t) >= 0; }); })
+        : S.results.filter(function (r) { return (String(r.sport).toLowerCase() === "boxe") === (S.rsport === "boxe"); });
+      if (!list.length) html = sTerms ? emptyHTML("Aucun résultat", "Aucun combat terminé ne correspond à « " + S.q.trim() + " ».")
+        : emptyHTML("Aucun résultat", "Aucun combat terminé trouvé pour cette catégorie.", true);
       else {
+        if (sTerms) html += '<p class="count">' + list.length + " résultat" + (list.length > 1 ? "s" : "") + "</p>";
         var groups = [], idx = {};
         list.forEach(function (r) { var k = r.date.slice(0, 7); if (!(k in idx)) { idx[k] = groups.length; groups.push([k, []]); } groups[idx[k]][1].push(r); });
         groups.forEach(function (g) {
