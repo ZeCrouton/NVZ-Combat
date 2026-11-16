@@ -219,10 +219,6 @@ footer p { margin: 0 0 6px; }
 <div class="scrim" id="scrim" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pt">
     <h2 id="pt">Personnalisation <button class="ib" id="btnClose" type="button" aria-label="Fermer"><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></h2>
-    <div class="set sw">
-      <div><h3>Mode sombre</h3><p>Design sombre chaleureux d'origine.</p></div>
-      <button class="toggle" id="tgDark" type="button" role="switch" aria-checked="true" aria-label="Mode sombre"></button>
-    </div>
     <div class="set">
       <h3>Couleur de l'application</h3>
       <div class="swatches" id="swatches"></div>
@@ -543,15 +539,13 @@ function applyTheme(dark, accentIndex) {
   var root = document.documentElement;
   root.setAttribute("data-theme", dark ? "dark" : "light");
   root.style.setProperty("--primary", ACCENTS[accentIndex][1]);
-  $("#tgDark").setAttribute("aria-checked", String(dark));
   var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = dark ? "#0D0908" : "#FAF7F2";
   Array.prototype.forEach.call(document.querySelectorAll(".sh"), function (b, i) { b.setAttribute("aria-pressed", String(i === accentIndex)); });
 }
 
-var prefs = { dark: store("nvz-dark") !== "0", accent: Math.max(0, Math.min(ACCENTS.length - 1, parseInt(store("nvz-accent"), 10) || 0)) };
+var prefs = { dark: true, accent: Math.max(0, Math.min(ACCENTS.length - 1, parseInt(store("nvz-accent"), 10) || 0)) };
 $("#swatches").innerHTML = ACCENTS.map(function (a, i) { return '<button class="sh" type="button" data-i="' + i + '" style="--c:' + a[1] + '" aria-pressed="false"><i></i>' + a[0] + "</button>"; }).join("");
 $("#swatches").addEventListener("click", function (e) { var b = e.target.closest(".sh"); if (!b) return; prefs.accent = +b.getAttribute("data-i"); store("nvz-accent", String(prefs.accent)); applyTheme(prefs.dark, prefs.accent); });
-$("#tgDark").addEventListener("click", function () { prefs.dark = !prefs.dark; store("nvz-dark", prefs.dark ? "1" : "0"); applyTheme(prefs.dark, prefs.accent); });
 
 function openPanel(on) { $("#scrim").hidden = !on; if (on) $("#btnClose").focus(); else $("#btnSettings").focus(); }
 $("#btnSettings").addEventListener("click", function () { openPanel(true); });
