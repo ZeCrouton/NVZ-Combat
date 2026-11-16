@@ -337,6 +337,9 @@ function store(k, v) { try { if (v === undefined) return localStorage.getItem(k)
 /* Traitement et Parsage des Données */
 function parisToday() { return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date()); }
 function parisNowMinutes() { var p = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).split(":").map(Number); return p[0] * 60 + p[1]; }
+/* Variantes d'orthographe indexées pour la recherche (ex. « Cyril » trouve « Ciryl ») */
+var SEARCH_ALIASES = [["ciryl", "cyril"]];
+function withAliases(s) { SEARCH_ALIASES.forEach(function (p) { if (s.indexOf(p[0]) >= 0) s += " " + p[1]; }); return s; }
 function addMonths(iso, n) { var p = iso.split("-").map(Number); var d = new Date(Date.UTC(p[0], p[1] - 1 + n, p[2])); return d.toISOString().slice(0, 10); }
 function sportLabel(s) { s = String(s).toLowerCase(); return s === "mma" ? "MMA" : s === "boxe" ? "Boxe" : /kick/.test(s) ? "Kick-boxing" : s.charAt(0).toUpperCase() + s.slice(1); }
 var dFmt = {
@@ -361,7 +364,7 @@ function parse(rows) {
       seen: o.last_seen_at ? Date.parse(o.last_seen_at) : null
     };
     var d = dateOf(f.date);
-    f.key = plain([a, b, f.org, f.event, sportLabel(f.sport), f.loc || "", f.tv.join(" "), f.weight || "", f.title || "", f.fr ? "francais" : "", dFmt.long.format(d), dFmt.short.format(d)].join(" "));
+    f.key = withAliases(plain([a, b, f.org, f.event, sportLabel(f.sport), f.loc || "", f.tv.join(" "), f.weight || "", f.title || "", f.fr ? "francais" : "", dFmt.long.format(d), dFmt.short.format(d)].join(" ")));
     out.push(f);
   });
   out.sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : y.hype - x.hype; });
@@ -643,7 +646,7 @@ function loadResults() {
   }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "res" || S.searching) render(); });
 }
 function resKey(r) {
-  return plain([r.a, r.b, r.org, r.event, sportLabel(r.sport), r.title || "", r.method || "", dFmt.long.format(dateOf(r.date)), dFmt.short.format(dateOf(r.date))].join(" "));
+  return withAliases(plain([r.a, r.b, r.org, r.event, sportLabel(r.sport), r.title || "", r.method || "", dFmt.long.format(dateOf(r.date)), dFmt.short.format(dateOf(r.date))].join(" ")));
 }
 function methodTxt(r) {
   if (r.w === "draw") return "Match nul";
