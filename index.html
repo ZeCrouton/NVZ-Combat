@@ -470,10 +470,13 @@ function render() {
   var base = fights.filter(function (f) { return (!sport || f.sport === sport) && (!S.fr || f.fr); });
   var counts = { star: 0, important: 0, autre: 0 }; base.forEach(function (f) { counts[f.tier]++; });
   var searchOn = S.searching && S.q.trim() !== "";
-  var shown;
+  var shown, resShown = [];
   if (searchOn) {
     var terms = plain(S.q).split(/\s+/).filter(Boolean);
     shown = fights.filter(function (f) { return terms.every(function (t) { return f.key.indexOf(t) >= 0; }); });
+    // La recherche renvoie aussi les combats terminés (résultats).
+    if (S.rs === "idle") loadResults();
+    resShown = (S.results || []).filter(function (r) { return terms.every(function (t) { return resKey(r).indexOf(t) >= 0; }); });
   } else shown = base.filter(function (f) { return f.tier === S.tier; });
 
   $("#tabs").innerHTML = TIERS.map(function (t) {
@@ -488,10 +491,10 @@ function render() {
   if (S.status === "loading" && !fights.length) html = '<div class="load"><div class="ring" role="status" aria-label="Chargement"></div></div>';
   else if (S.status === "failed") html = emptyHTML("Impossible de charger", "Vérifiez votre connexion, puis réessayer.", true);
   else if (!fights.length) html = emptyHTML("La liste se remplit", "Les premiers combats arrivent avec la prochaine mise à jour.");
-  else if (searchOn && !shown.length) html = emptyHTML("Aucun résultat", "Aucun combat ne correspond à « " + S.q.trim() + " ».");
-  else if (!shown.length) html = emptyHTML("Rien ici pour l'instant", "Aucun combat ne correspond à ces filtres.");
+  else if (!shown.length && !resShown.length) html = searchOn ? emptyHTML("Aucun résultat", "Aucun combat ne correspond à « " + S.q.trim() + " ».") : emptyHTML("Rien ici pour l'instant", "Aucun combat ne correspond à ces filtres.");
   else {
-    if (searchOn) html += '<p class="count">' + shown.length + " résultat" + (shown.length > 1 ? "s" : "") + "</p>";
+    var total = shown.length + resShown.length;
+    if (searchOn) html += '<p class="count">' + total + " résultat" + (total > 1 ? "s" : "") + "</p>";
     var groups = [], idx = {};
     shown.forEach(function (f) { var k = f.date.slice(0, 7); if (!(k in idx)) { idx[k] = groups.length; groups.push([k, []]); } groups[idx[k]][1].push(f); });
     groups.forEach(function (g) {
@@ -499,6 +502,8 @@ function render() {
       html += '<section><div class="month"><h2>' + esc(label) + "</h2><span>" + g[1].length + " combat" + (g[1].length > 1 ? "s" : "") + '</span></div><div class="list">' +
         g[1].map(cardHTML).join("") + "</div></section>";
     });
+    if (resShown.length) html += '<section><div class="month"><h2>Résultats</h2><span>' + resShown.length + " combat" + (resShown.length > 1 ? "s" : "") + '</span></div><div class="list">' +
+      resShown.map(resHTML).join("") + "</div></section>";
   }
   $("#main").innerHTML = html;
 
@@ -635,7 +640,10 @@ function loadResults() {
     var r = mergeRes(l); S.rOff = !r.length; if (S.rOff) r = mockRes();
     r.sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
     S.results = r; S.rs = "ok";
-  }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "res") render(); });
+  }).then(function () { $("#btnRefresh").classList.remove("spin"); if (S.view === "res" || S.searching) render(); });
+}
+function resKey(r) {
+  return plain([r.a, r.b, r.org, r.event, sportLabel(r.sport), r.title || "", r.method || "", dFmt.long.format(dateOf(r.date)), dFmt.short.format(dateOf(r.date))].join(" "));
 }
 function methodTxt(r) {
   if (r.w === "draw") return "Match nul";
