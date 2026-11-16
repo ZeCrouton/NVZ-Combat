@@ -1,0 +1,38 @@
+name: Mise à jour des classements
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # tous les jours à 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-rankings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Récupérer les classements
+        run: python3 scripts/update_rankings.py
+
+      - name: Commit si changement
+        run: |
+          if git diff --quiet -- data/rankings.json; then
+            echo "Aucun changement à committer."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/rankings.json
+          git commit -m "Mise à jour des classements UFC"
+          git push
