@@ -340,6 +340,7 @@ function store(k, v) { try { if (v === undefined) return localStorage.getItem(k)
 
 /* Traitement et Parsage des Données */
 function parisToday() { return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date()); }
+function parisNowMinutes() { var p = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date()).split(":").map(Number); return p[0] * 60 + p[1]; }
 function addMonths(iso, n) { var p = iso.split("-").map(Number); var d = new Date(Date.UTC(p[0], p[1] - 1 + n, p[2])); return d.toISOString().slice(0, 10); }
 function sportLabel(s) { s = String(s).toLowerCase(); return s === "mma" ? "MMA" : s === "boxe" ? "Boxe" : /kick/.test(s) ? "Kick-boxing" : s.charAt(0).toUpperCase() + s.slice(1); }
 var dFmt = {
@@ -368,7 +369,23 @@ function parse(rows) {
     out.push(f);
   });
   out.sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : y.hype - x.hype; });
-  return out;
+
+  // Retire les combats passés (terminés) : seuls les combats à venir sont gardés, recherche comprise.
+  // Un combat du jour est retiré 6 h après son heure de début.
+  var today = parisToday(), nowMin = parisNowMinutes(), seenKeys = {}, upcoming = [];
+  out.forEach(function (f) {
+    if (f.date < today) return;
+    if (f.date === today && f.time) {
+      var t = f.time.split(":").map(Number);
+      if (nowMin > t[0] * 60 + t[1] + 360) return;
+    }
+    // Évite les doublons : même duel le même jour = même combat (on garde le plus « hype »).
+    var key = [plain(f.a), plain(f.b)].sort().join("|") + "|" + f.date;
+    if (seenKeys[key]) return;
+    seenKeys[key] = true;
+    upcoming.push(f);
+  });
+  return upcoming;
 }
 
 function fetchRows() {
