@@ -211,6 +211,16 @@ footer p { margin: 0 0 6px; }
 .rkf span{font:400 22px var(--display);color:var(--primary);min-width:34px}.rkf b{flex:1}
 .rkr{grid-template-columns:40px 1fr;align-items:center;gap:0 12px}.rkr .rn{font:400 28px/1 var(--display);color:var(--primary);text-align:center;grid-row:span 2}
 .rkr.ch .rn{color:var(--star)}.rkr small{grid-column:2}
+/* ---- Adaptation smartphone (≤ 480 px) : cartes à venir et résultats */
+@media (max-width: 480px) {
+  .card { padding: 14px 12px; }
+  .head { gap: 8px; }
+  .org, .evt { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+  .vs { gap: 6px; }
+  .vs .n { font-size: clamp(18px, 6vw, 26px); }
+  .pills { gap: 4px; }
+  .verdict small { overflow-wrap: anywhere; }
+}
 </style>
 </head>
 <body>
