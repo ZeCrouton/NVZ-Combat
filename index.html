@@ -313,6 +313,10 @@ var dFmt = {
 function dateOf(iso) { var p = iso.split("-").map(Number); return new Date(p[0], p[1] - 1, p[2]); }
 function nz(v) { return v == null || String(v).trim() === "" ? null : String(v).trim(); }
 
+/* Diffuseur en France par défaut quand la source n'en donne pas */
+var DEFAULT_TV = [[/\bares\b/, ["CANAL+ Sport 360"]], [/\bpfl\b|professional fighters/, ["RMC Sport"]]];
+function defaultTV(org) { var o = plain(org || ""); for (var i = 0; i < DEFAULT_TV.length; i++) if (DEFAULT_TV[i][0].test(o)) return DEFAULT_TV[i][1].slice(); return []; }
+
 function parse(rows) {
   var out = [];
   rows.forEach(function (o) {
@@ -326,6 +330,7 @@ function parse(rows) {
       tv: Array.isArray(o.broadcasters) ? o.broadcasters.map(nz).filter(Boolean) : [],
       seen: o.last_seen_at ? Date.parse(o.last_seen_at) : null
     };
+    if (!f.tv.length) f.tv = defaultTV(f.org);
     var d = dateOf(f.date);
     f.key = withAliases(plain([a, b, f.org, f.event, sportLabel(f.sport), f.loc || "", f.tv.join(" "), f.weight || "", f.title || "", f.fr ? "francais" : "", dFmt.long.format(d), dFmt.short.format(d)].join(" ")));
     f.kf = withAliases(plain(a + " " + b));

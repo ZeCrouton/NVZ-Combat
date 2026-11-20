@@ -13,6 +13,8 @@ OUT = os.path.join(DATA, "auto-fights.json")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en,fr;q=0.8"}
 PARIS = ZoneInfo("Europe/Paris")
+# (page next-fight, nom affiché, diffuseurs en France, tier)
+ORGS = [("ares-fc", "Ares FC", ["CANAL+ Sport 360"], "star"), ("pfl", "PFL", ["RMC Sport"], "important")]
 
 import time
 def get(url):
@@ -37,7 +39,7 @@ def jsonld(html):
 def text(x):
     return H.unescape(re.sub(r"<[^>]+>", "", x)).strip()
 
-def results_of(page, ev, date):
+def results_of(page, ev, date, org):
     out = []
     m = re.search(r"Top fight results:(.*?)</ul>", page, re.S)
     for li in re.findall(r"<li>(.*?)</li>", m.group(1) if m else "", re.S):
@@ -45,10 +47,10 @@ def results_of(page, ev, date):
         d = re.match(r"(.+?) defeated (.+?)(?: by (.+?))?(?: in round (\d+))?$", t)
         n = re.match(r"(.+?) and (.+?) fought to a (?:draw|no contest)", t)
         if d:
-            out.append({"sport": "mma", "org": "Ares FC", "event": ev.get("name") or "", "date": date, "a": d.group(1), "b": d.group(2),
+            out.append({"sport": "mma", "org": org, "event": ev.get("name") or "", "date": date, "a": d.group(1), "b": d.group(2),
                         "w": "a", "method": d.group(3) or "", "round": d.group(4), "time": None, "title": None, "src": "next-fight"})
         elif n:
-            out.append({"sport": "mma", "org": "Ares FC", "event": ev.get("name") or "", "date": date, "a": n.group(1), "b": n.group(2),
+            out.append({"sport": "mma", "org": org, "event": ev.get("name") or "", "date": date, "a": n.group(1), "b": n.group(2),
                         "w": "draw", "method": "", "round": None, "time": None, "title": None, "src": "next-fight"})
     return out
 
@@ -82,53 +84,54 @@ def write(name, rows):
     with open(os.path.join(DATA, name), "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False, indent=2); f.write("\n")
 
-def main():
-    n = news()
-    if n:
-        write("auto-news.json", n)
-    try:
-        org = get(BASE + "/en/organization/ares-fc")
-    except Exception as e:
-        print("next-fight injoignable, combats/résultats Ares inchangés :", e, "|", len(n), "actu(s)"); return
+def scan(slug, name, tv, tier, today):
+    org = get(BASE + "/en/organization/" + slug)
     links = sorted(set(re.findall(r'href="(/en/event/[^"#?]+)"', org)))
-    today = datetime.datetime.now(PARIS).date()
     rows, res = [], []
     for l in links:
         try:
             time.sleep(2); page = get(BASE + l); ev = jsonld(page)
         except Exception as e:
             print("échec", l, e); continue
-        if not ev:
+        if not ev or not ev.get("startDate"):
             continue
-        if ev.get("startDate"):
-            d0 = datetime.datetime.fromisoformat(ev["startDate"].replace("Z", "+00:00")).astimezone(PARIS).date()
-            if today - datetime.timedelta(days=125) <= d0 <= today:
-                res += results_of(page, ev, d0.isoformat())
-        comp = [c.get("name", "").strip() for c in ev.get("competitor", []) if c.get("name")]
-        if len(comp) < 2 or not ev.get("startDate"):
-            continue  # affiche pas encore connue (« tbd vs tbd »)
         raw = datetime.datetime.fromisoformat(ev["startDate"].replace("Z", "+00:00"))
         unknown_time = raw.hour == 0 and raw.minute == 0  # minuit UTC = heure non communiquée
         start = raw.astimezone(PARIS) if not unknown_time else raw.replace(tzinfo=PARIS)
-        if start.date() < today or any(r["event"] == ev.get("name") for r in res):  # terminé = plus « à venir »
-            continue
+        r = results_of(page, ev, start.date().isoformat(), name) if today - datetime.timedelta(days=125) <= start.date() <= today else []
+        res += r
+        comp = [c.get("name", "").strip() for c in ev.get("competitor", []) if c.get("name")]
+        if r or start.date() < today or len(comp) < 2:
+            continue  # terminé, passé, ou affiche pas encore connue
         loc = ev.get("location", {}) or {}
         place = ", ".join(x for x in [loc.get("name"), (loc.get("address") or {}).get("addressLocality")] if x)
         rows.append({
-            "id": "auto-" + l.rsplit("/", 1)[-1], "sport": "mma", "organization": "Ares FC",
+            "id": "auto-" + l.rsplit("/", 1)[-1], "sport": "mma", "organization": name,
             "event_name": ev.get("name"), "event_date": start.date().isoformat(),
             "start_time_paris": None if unknown_time else start.strftime("%H:%M"), "location": place or None,
             "fighter_a": comp[0], "fighter_b": comp[1], "weight_class": None, "title": None,
-            "card_position": "main", "french_involved": False, "hype_score": 80,
-            "hype_reason": "Combat principal d'un événement Ares FC.", "tier": "star",
-            "broadcasters": [], "last_seen_at": None,
+            "card_position": "main", "french_involved": False, "hype_score": 80 if tier == "star" else 65,
+            "hype_reason": "Combat principal d'un événement " + name + ".", "tier": tier,
+            "broadcasters": tv, "last_seen_at": None,
         })
-    if not rows and not links:
-        print("Aucun lien d'événement trouvé : fichier laissé inchangé"); sys.exit(1)
-    rows.sort(key=lambda r: r["event_date"])
-    write("auto-fights.json", rows)
-    if links:
-        res.sort(key=lambda r: r["date"], reverse=True); write("auto-results.json", res)
-    print(len(rows), "combat(s) Ares,", len(res), "résultat(s),", len(n), "actu(s)")
+    return rows, res
+
+def main():
+    n = news()
+    if n:
+        write("auto-news.json", n)
+    today = datetime.datetime.now(PARIS).date()
+    rows, res, ok = [], [], 0
+    for slug, name, tv, tier in ORGS:
+        try:
+            a, b = scan(slug, name, tv, tier, today); rows += a; res += b; ok += 1
+            print(name, ":", len(a), "à venir,", len(b), "résultat(s)")
+        except Exception as e:
+            print(name, ": next-fight injoignable", e)
+    if ok < len(ORGS):
+        print("Une organisation a échoué : combats/résultats laissés inchangés,", len(n), "actu(s)"); return
+    rows.sort(key=lambda r: r["event_date"]); write("auto-fights.json", rows)
+    res.sort(key=lambda r: r["date"], reverse=True); write("auto-results.json", res)
+    print(len(rows), "combat(s),", len(res), "résultat(s),", len(n), "actu(s)")
 
 main()
