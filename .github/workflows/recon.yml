@@ -5,21 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          UA="Mozilla/5.0 (compatible; NVZ-Combat-bot)"
-          curl -sSL -A "$UA" -o p.html https://next-fight.com/en/event/ares-43-paris
-          curl -sSL -A "$UA" -o f.html "https://news.google.com/rss/search?hl=fr&gl=FR&ceid=FR:fr&q=%22Ares%22+MMA"
+          curl -sSL -A "Mozilla/5.0 (compatible; NVZ-Combat-bot)" -o p.html https://next-fight.com/en/event/ares-43-paris
           python3 - <<'PY'
-          import re,html
+          import re
           h=open("p.html",encoding="utf-8").read()
-          t=re.sub(r'<script.*?</script>','',h,flags=re.S); t=re.sub(r'<[^>]+>','\n',t)
-          L=[html.unescape(x).strip() for x in t.split("\n") if x.strip()]
-          i=next((k for k,x in enumerate(L) if x.lower().startswith("fight card")),0)
-          print("\n".join(L[i:i+150]))
-          print("==== fighter links ====")
-          print(re.findall(r'href="(/en/fighter/[^"]+)"',h)[:40])
-          print("==== winner-ish ====")
-          for k in ("winner","Win","KO","Decision","Submission"): print(k,h.count(k))
-          f=open("f.html",encoding="utf-8").read()
-          print("==== RSS ====", f.count("<item>"))
-          for m in re.findall(r"<title>(.*?)</title>",f)[:15]: print(m)
+          h=re.sub(r'<script.*?</script>','',h,flags=re.S)
+          h=re.sub(r'\s(class|style)="[^"]*"','',h); h=re.sub(r'<(svg|path)[^>]*>|</(svg|path)>','',h)
+          i=h.find('/en/fighter/'); print(h[i-600:i+5000])
           PY
