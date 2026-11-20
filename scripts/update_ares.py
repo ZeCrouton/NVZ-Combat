@@ -38,7 +38,9 @@ def main():
         comp = [c.get("name", "").strip() for c in ev.get("competitor", []) if c.get("name")]
         if len(comp) < 2 or not ev.get("startDate"):
             continue  # affiche pas encore connue (« tbd vs tbd »)
-        start = datetime.datetime.fromisoformat(ev["startDate"].replace("Z", "+00:00")).astimezone(PARIS)
+        raw = datetime.datetime.fromisoformat(ev["startDate"].replace("Z", "+00:00"))
+        unknown_time = raw.hour == 0 and raw.minute == 0  # minuit UTC = heure non communiquée
+        start = raw.astimezone(PARIS) if not unknown_time else raw.replace(tzinfo=PARIS)
         if start.date() < today:
             continue
         loc = ev.get("location", {}) or {}
@@ -46,7 +48,7 @@ def main():
         rows.append({
             "id": "auto-" + l.rsplit("/", 1)[-1], "sport": "mma", "organization": "Ares FC",
             "event_name": ev.get("name"), "event_date": start.date().isoformat(),
-            "start_time_paris": start.strftime("%H:%M"), "location": place or None,
+            "start_time_paris": None if unknown_time else start.strftime("%H:%M"), "location": place or None,
             "fighter_a": comp[0], "fighter_b": comp[1], "weight_class": None, "title": None,
             "card_position": "main", "french_involved": False, "hype_score": 80,
             "hype_reason": "Combat principal d'un événement Ares FC.", "tier": "star",
