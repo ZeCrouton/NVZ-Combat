@@ -602,6 +602,9 @@ function tsdbRes() {
     }).catch(function () { return []; });
   })).then(flat);
 }
+function autoRes() {
+  return jget("data/auto-results.json").then(function (j) { return Array.isArray(j) ? j : []; }).catch(function () { return []; });
+}
 function mergeRes(lists) {
   var seen = {}, out = [];
   flat(lists).forEach(function (r) {
@@ -615,7 +618,7 @@ function mergeRes(lists) {
 }
 function loadResults() {
   if (S.rl) return; S.rl = 1; S.rs = "loading"; $("#btnRefresh").classList.add("spin");
-  Promise.all([dbRes(), espnRes(), tsdbRes()]).then(function (l) {
+  Promise.all([dbRes(), espnRes(), tsdbRes(), autoRes()]).then(function (l) {
     var r = mergeRes(l); S.rOff = !r.length;
     r.sort(function (x, y) { return x.date < y.date ? 1 : x.date > y.date ? -1 : 0; });
     S.results = r; S.rs = "ok";
@@ -642,7 +645,7 @@ function resHTML(r, i) {
 /* --- Actus : agrégation de flux RSS (proxy rss2json, repli allorigins) --- */
 var G = "https://news.google.com/rss/search?hl=fr&gl=FR&ceid=FR:fr&q=";
 var FEEDS = [
-  ["Google Actus", G + "MMA+UFC", "mma", "fr"], ["Google Actus", G + "boxe+championnat+du+monde", "boxe", "fr"], ["Google Actus", G + "PFL+OR+KSW+OR+ARES+MMA", "mma", "fr"]
+  ["Google Actus", G + "MMA+UFC", "mma", "fr"], ["Google Actus", G + "boxe+championnat+du+monde", "boxe", "fr"], ["Google Actus", G + "PFL+OR+KSW+OR+ARES+MMA", "mma", "fr"], ["Google Actus", G + "%22Ares%22+MMA", "mma", "fr"]
 ];
 function feed(F) {
   var u = encodeURIComponent(F[1]);
@@ -665,7 +668,9 @@ function feed(F) {
 }
 function loadNews() {
   if (S.nl) return; S.nl = 1; S.ns = "loading"; $("#btnRefresh").classList.add("spin");
-  Promise.all(FEEDS.map(feed)).then(function (l) {
+  /* Actus pré-récupérées par le robot GitHub (même site, sans proxy) + flux en direct en complément */
+  var auto = jget("data/auto-news.json").then(function (j) { return Array.isArray(j) ? j : []; }).catch(function () { return []; });
+  Promise.all([auto].concat(FEEDS.map(feed))).then(function (l) {
     var seen = {}, out = flat(l).filter(function (n) { var k = plain(n.t || "").slice(0, 60); if (!n.t || !n.l || !n.d || seen[k]) return false; seen[k] = 1; return true; });
     out.sort(function (x, y) { return y.d - x.d; });
     if (out.length) { S.news = out.slice(0, 80); store("nvz-news", JSON.stringify(S.news)); }
