@@ -10,11 +10,18 @@ from zoneinfo import ZoneInfo
 BASE = "https://next-fight.com"
 DATA = os.path.join(os.path.dirname(__file__), "..", "data")
 OUT = os.path.join(DATA, "auto-fights.json")
-UA = {"User-Agent": "Mozilla/5.0 (compatible; NVZ-Combat-bot)", "Accept-Language": "en"}
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en,fr;q=0.8"}
 PARIS = ZoneInfo("Europe/Paris")
 
+import time
 def get(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read().decode("utf-8", "replace")
+    for k in range(3):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read().decode("utf-8", "replace")
+        except Exception as e:
+            if k == 2: raise
+            print("nouvel essai", url, e); time.sleep(10 * (k + 1))
 
 def jsonld(html):
     for m in re.finditer(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', html, re.S):
@@ -76,13 +83,19 @@ def write(name, rows):
         json.dump(rows, f, ensure_ascii=False, indent=2); f.write("\n")
 
 def main():
-    org = get(BASE + "/en/organization/ares-fc")
+    n = news()
+    if n:
+        write("auto-news.json", n)
+    try:
+        org = get(BASE + "/en/organization/ares-fc")
+    except Exception as e:
+        print("next-fight injoignable, combats/résultats Ares inchangés :", e, "|", len(n), "actu(s)"); return
     links = sorted(set(re.findall(r'href="(/en/event/[^"#?]+)"', org)))
     today = datetime.datetime.now(PARIS).date()
     rows, res = [], []
     for l in links:
         try:
-            page = get(BASE + l); ev = jsonld(page)
+            time.sleep(2); page = get(BASE + l); ev = jsonld(page)
         except Exception as e:
             print("échec", l, e); continue
         if not ev:
@@ -116,9 +129,6 @@ def main():
     write("auto-fights.json", rows)
     if links:
         res.sort(key=lambda r: r["date"], reverse=True); write("auto-results.json", res)
-    n = news()
-    if n:
-        write("auto-news.json", n)
     print(len(rows), "combat(s) Ares,", len(res), "résultat(s),", len(n), "actu(s)")
 
 main()
