@@ -365,25 +365,39 @@ function fetchRows() {
   });
 }
 
+/* Combats ajoutés à la main (data/extra-fights.json), fusionnés avec la base ; vide si absent. */
+function fetchExtras() {
+  return fetch("data/extra-fights.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (j) { return Array.isArray(j) ? j : []; }).catch(function () { return []; });
+}
+
 function load(manual) {
   if (S.loading) return;
   S.loading = true; $("#btnRefresh").classList.add("spin");
+  var extrasP = fetchExtras();
   fetchRows().then(function (raw) {
-    var list = parse(JSON.parse(raw));
+    return extrasP.then(function (ex) { return [raw, ex]; });
+  }).then(function (res) {
+    var raw = res[0];
+    var list = parse(JSON.parse(raw).concat(res[1]));
     if (!list.length) throw new Error("Données vides");
     store("nvz-cache", raw);
     S.fights = list; S.status = "ok"; S.offline = false;
   }).catch(function () {
-    // Utiliser le cache local ou la mock data de secours
+    // Utiliser le cache local, avec les combats ajoutés à la main
     var cached = store("nvz-cache");
-    if (cached) {
-      try {
-        var list = parse(JSON.parse(cached)).filter(function (f) { return f.date >= parisToday(); });
-        if (list.length) { S.fights = list; S.status = "ok"; S.offline = true; return; }
-      } catch (e) {}
-    }
-    // Aucune donnée disponible : on n'invente rien
-    if (S.fights.length) S.offline = true; else S.status = "failed";
+    return extrasP.then(function (ex) {
+      if (cached) {
+        try {
+          var list = parse(JSON.parse(cached).concat(ex)).filter(function (f) { return f.date >= parisToday(); });
+          if (list.length) { S.fights = list; S.status = "ok"; S.offline = true; return; }
+        } catch (e) {}
+      }
+      var only = parse(ex);
+      if (only.length && !S.fights.length) { S.fights = only; S.status = "ok"; S.offline = true; return; }
+      // Aucune donnée disponible : on n'invente rien
+      if (S.fights.length) S.offline = true; else S.status = "failed";
+    });
   }).then(function () {
     S.loading = false; $("#btnRefresh").classList.remove("spin"); render();
   });
