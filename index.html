@@ -367,8 +367,10 @@ function fetchRows() {
 
 /* Combats ajoutés à la main (data/extra-fights.json), fusionnés avec la base ; vide si absent. */
 function fetchExtras() {
-  return fetch("data/extra-fights.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; })
-    .then(function (j) { return Array.isArray(j) ? j : []; }).catch(function () { return []; });
+  /* extra-fights.json = ajouts à la main ; auto-fights.json = écrit par le robot GitHub (Ares) */
+  var one = function (u) { return fetch(u, { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (j) { return Array.isArray(j) ? j : []; }).catch(function () { return []; }); };
+  return Promise.all([one("data/extra-fights.json"), one("data/auto-fights.json")]).then(function (a) { return a[0].concat(a[1]); });
 }
 
 function load(manual) {
