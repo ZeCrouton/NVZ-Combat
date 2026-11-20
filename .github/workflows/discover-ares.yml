@@ -7,15 +7,16 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     steps:
-      - name: Récupérer les pages Ares
+      - name: JSON-LD des pages Ares
         run: |
           UA="Mozilla/5.0 (compatible; NVZ-Combat-bot)"
-          curl -sSL -A "$UA" -o org.html -w "org %{http_code} %{size_download}\n" https://next-fight.com/en/organization/ares-fc
-          curl -sSL -A "$UA" -o ev.html -w "event %{http_code} %{size_download}\n" https://next-fight.com/en/event/ares-45-zebo-vs-baki-2
-          echo "=== liens /event/ de la page organisation ==="
-          grep -oE 'href="[^"]*/event/[^"]*"' org.html | sort -u | head -40
-          echo "=== JSON-LD / NEXT_DATA ? ==="
-          grep -c 'application/ld+json' ev.html org.html || true
-          grep -c '__NEXT_DATA__' ev.html org.html || true
-          echo "=== texte de la page événement (extrait) ==="
-          sed -e 's/<script[^>]*>.*<\/script>//g' -e 's/<[^>]*>/\n/g' ev.html | grep -v '^\s*$' | head -120
+          curl -sSL -A "$UA" -o org.html https://next-fight.com/en/organization/ares-fc
+          curl -sSL -A "$UA" -o ev.html https://next-fight.com/en/event/ares-45-zebo-vs-baki-2
+          python3 - <<'PY'
+          import re, json
+          for f in ("org.html", "ev.html"):
+              h = open(f, encoding="utf-8").read()
+              print("=====", f)
+              for m in re.finditer(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', h, re.S):
+                  print(m.group(1)[:3500]); print("-----")
+          PY
