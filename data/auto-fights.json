@@ -16,7 +16,75 @@
     "hype_score": 80,
     "hype_reason": "Combat principal d'un événement Ares FC.",
     "tier": "star",
-    "broadcasters": [],
+    "broadcasters": [
+      "CANAL+ Sport 360"
+    ],
+    "last_seen_at": null
+  },
+  {
+    "id": "auto-pfl-mena-12-2026-finals",
+    "sport": "mma",
+    "organization": "PFL",
+    "event_name": "PFL MENA 12: 2026 Finals",
+    "event_date": "2026-12-11",
+    "start_time_paris": null,
+    "location": "Dhahran Expo, Khobar",
+    "fighter_a": "Ahmed Albrahim",
+    "fighter_b": "Hassan Ahmed Mohamed Abdelmonem",
+    "weight_class": null,
+    "title": null,
+    "card_position": "main",
+    "french_involved": false,
+    "hype_score": 65,
+    "hype_reason": "Combat principal d'un événement PFL.",
+    "tier": "important",
+    "broadcasters": [
+      "RMC Sport"
+    ],
+    "last_seen_at": null
+  },
+  {
+    "id": "auto-pfl-africa-4-2026-finals",
+    "sport": "mma",
+    "organization": "PFL",
+    "event_name": "PFL Africa 4: 2026 Finals",
+    "event_date": "2026-12-12",
+    "start_time_paris": null,
+    "location": "BK Arena, Kigali",
+    "fighter_a": "Shido Boris Esperanca",
+    "fighter_b": "David Samuel",
+    "weight_class": null,
+    "title": null,
+    "card_position": "main",
+    "french_involved": false,
+    "hype_score": 65,
+    "hype_reason": "Combat principal d'un événement PFL.",
+    "tier": "important",
+    "broadcasters": [
+      "RMC Sport"
+    ],
+    "last_seen_at": null
+  },
+  {
+    "id": "auto-professional-fighters-league-pfl-lyon",
+    "sport": "mma",
+    "organization": "PFL",
+    "event_name": "PFL Lyon",
+    "event_date": "2026-12-19",
+    "start_time_paris": "21:00",
+    "location": "LDLC Arena, Lyon",
+    "fighter_a": "Taylor Lapilus",
+    "fighter_b": "Mitchell McKee",
+    "weight_class": null,
+    "title": null,
+    "card_position": "main",
+    "french_involved": false,
+    "hype_score": 65,
+    "hype_reason": "Combat principal d'un événement PFL.",
+    "tier": "important",
+    "broadcasters": [
+      "RMC Sport"
+    ],
     "last_seen_at": null
   },
   {
@@ -36,7 +104,9 @@
     "hype_score": 80,
     "hype_reason": "Combat principal d'un événement Ares FC.",
     "tier": "star",
-    "broadcasters": [],
+    "broadcasters": [
+      "CANAL+ Sport 360"
+    ],
     "last_seen_at": null
   }
 ]
