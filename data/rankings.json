@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20T06:56Z",
+ "updated": "2026-11-21T06:53Z",
  "src": null,
  "media": [
   {
@@ -147,12 +147,12 @@
     },
     {
      "rank": 12,
-     "name": "Steve Erceg",
+     "name": "Sumudaerji",
      "sub": ""
     },
     {
      "rank": 12,
-     "name": "Sumudaerji",
+     "name": "Steve Erceg",
      "sub": ""
     },
     {
@@ -1489,13 +1489,13 @@
     },
     {
      "rank": 9,
-     "name": "Uroš Medić",
-     "sub": ""
+     "name": "Kevin Holland",
+     "sub": "▲ 6"
     },
     {
      "rank": 10,
-     "name": "Kevin Holland",
-     "sub": "▲ 5"
+     "name": "Uroš Medić",
+     "sub": "▼ 1"
     },
     {
      "rank": 11,
@@ -1799,68 +1799,68 @@
     },
     {
      "rank": 3,
-     "name": "Virna Jandiroba",
-     "sub": ""
+     "name": "Denise Gomes",
+     "sub": "▲ 1"
     },
     {
      "rank": 4,
-     "name": "Denise Gomes",
-     "sub": ""
+     "name": "Gillian Robertson",
+     "sub": "▲ 1"
     },
     {
      "rank": 5,
-     "name": "Gillian Robertson",
-     "sub": ""
+     "name": "Fatima Kline",
+     "sub": "▲ 1"
     },
     {
      "rank": 6,
-     "name": "Fatima Kline",
-     "sub": ""
+     "name": "Piera Rodriguez",
+     "sub": "▲ 1"
     },
     {
      "rank": 7,
-     "name": "Piera Rodriguez",
-     "sub": ""
+     "name": "Iasmin Lucindo",
+     "sub": "▲ 1"
     },
     {
      "rank": 8,
-     "name": "Iasmin Lucindo",
-     "sub": ""
+     "name": "Alexia Thainara",
+     "sub": "▲ 1"
     },
     {
      "rank": 9,
-     "name": "Alexia Thainara",
-     "sub": ""
+     "name": "Loopy Godinez",
+     "sub": "▲ 1"
     },
     {
      "rank": 10,
-     "name": "Loopy Godinez",
-     "sub": ""
+     "name": "Yan Xiaonan",
+     "sub": "▲ 1"
     },
     {
      "rank": 11,
-     "name": "Yan Xiaonan",
-     "sub": ""
+     "name": "Mizuki",
+     "sub": "▲ 1"
     },
     {
      "rank": 12,
-     "name": "Mizuki",
-     "sub": ""
+     "name": "Tabatha Ricci",
+     "sub": "▲ 1"
     },
     {
      "rank": 13,
-     "name": "Tabatha Ricci",
-     "sub": ""
+     "name": "Amanda Lemos",
+     "sub": "▲ 1"
     },
     {
      "rank": 14,
-     "name": "Amanda Lemos",
-     "sub": ""
+     "name": "Sam Hughes",
+     "sub": "▲ 1"
     },
     {
      "rank": 15,
-     "name": "Sam Hughes",
-     "sub": ""
+     "name": "Talita Alencar",
+     "sub": "Nouveau"
     }
    ]
   },
