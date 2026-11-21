@@ -1,0 +1,16 @@
+name: Recon (temporaire)
+on: { workflow_dispatch: {} }
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sSL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36" -o p.html https://next-fight.com/en/event/ares-45-zebo-vs-baki-2
+          python3 - <<'PY'
+          import re,html
+          h=open("p.html",encoding="utf-8").read()
+          print("size",len(h),"Top fight results" in h, "Finished" in h, "Live" in h)
+          t=re.sub(r'<script.*?</script>','',h,flags=re.S)
+          i=t.find('id="fight-card"'); s=re.sub(r'<[^>]+>','|',t[i:i+60000]); s=re.sub(r'\|+','|',html.unescape(s))
+          print(s[:3000])
+          PY
