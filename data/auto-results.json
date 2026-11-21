@@ -418,5 +418,33 @@
     "time": null,
     "title": null,
     "src": "next-fight"
+  },
+  {
+    "sport": "mma",
+    "org": "Ares FC",
+    "event": "Ares 43 - Paris",
+    "date": "2026-09-25",
+    "a": "Alexis Nicolas",
+    "b": "Ilyasse Drabo",
+    "w": "a",
+    "method": "TKO (Punches)",
+    "round": "1",
+    "time": null,
+    "title": null,
+    "src": "next-fight"
+  },
+  {
+    "sport": "mma",
+    "org": "Ares FC",
+    "event": "Ares 43 - Paris",
+    "date": "2026-09-25",
+    "a": "Akhmed Amaev",
+    "b": "Luke Shanks",
+    "w": "a",
+    "method": "Decision (Unanimous)",
+    "round": null,
+    "time": null,
+    "title": null,
+    "src": "next-fight"
   }
 ]
