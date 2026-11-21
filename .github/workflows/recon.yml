@@ -10,7 +10,6 @@ jobs:
           import re,html
           h=open("p.html",encoding="utf-8").read()
           print("size",len(h),"Top fight results" in h, "Finished" in h, "Live" in h)
-          t=re.sub(r'<script.*?</script>','',h,flags=re.S)
-          i=t.find('id="fight-card"'); s=re.sub(r'<[^>]+>','|',t[i:i+60000]); s=re.sub(r'\|+','|',html.unescape(s))
-          print(s[:3000])
+          t=re.sub(r'<script.*?</script>','',h,flags=re.S); t=re.sub(r'<img[^>]*>|<svg.*?</svg>','',t,flags=re.S)
+          i=t.find('Co-main event'); j=t.find('Other fights',i); print(t[i:j][:9000])
           PY
