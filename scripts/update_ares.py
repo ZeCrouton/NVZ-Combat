@@ -68,8 +68,11 @@ def card_results(page, ev, date, org):
 
 def results_of(page, ev, date, org):
     card = card_results(page, ev, date, org)
-    if card:
-        return card
+    key = lambda r: "|".join(sorted(re.sub(r"\W+", "", x.lower())[-6:] for x in (r["a"], r["b"])))
+    seen = {key(r) for r in card}
+    return card + [r for r in summary_results(page, ev, date, org) if key(r) not in seen]
+
+def summary_results(page, ev, date, org):
     out = []
     m = re.search(r"Top fight results:(.*?)</ul>", page, re.S)
     for li in re.findall(r"<li>(.*?)</li>", m.group(1) if m else "", re.S):
