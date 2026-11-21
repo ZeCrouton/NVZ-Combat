@@ -39,7 +39,37 @@ def jsonld(html):
 def text(x):
     return H.unescape(re.sub(r"<[^>]+>", "", x)).strip()
 
+METHODS = {"DEC": "Decision", "SUB": "Submission", "TKO": "TKO", "KO": "KO", "DQ": "Disqualification", "NC": "No contest"}
+
+def card_results(page, ev, date, org):
+    """Carte complète : chaque combat est un <details class="nf-fight-fold">, le vainqueur porte nf-fight-win."""
+    out = []
+    for chunk in page.split('<details class="nf-fight-fold"')[1:]:
+        chunk = chunk.split("</summary>")[0]
+        sides = chunk.split('class="nf-fight-side')
+        if len(sides) < 3:
+            continue
+        names = [re.search(r'class="nf-fight-full">([^<]+)<', x) for x in sides[1:3]]
+        pill = re.search(r'class="nf-fight-pill">([^<]+)(?:<span class="nf-fight-detail"><span aria-hidden="true"> · </span>([^<]+))?', chunk)
+        if not all(names) or not pill:
+            continue  # combat pas encore terminé (ou annulé)
+        a, b = (H.unescape(n.group(1)).strip() for n in names)
+        txt, det = pill.group(1).strip(), (pill.group(2) or "").strip()
+        wa, wb = "nf-fight-win" in sides[1], "nf-fight-win" in sides[2]
+        if wa == wb and not re.search(r"draw|nul|nc", txt + " " + det, re.I):
+            continue
+        rd = re.search(r"R(\d+)", txt)
+        m = METHODS.get(txt.split()[0].upper(), txt.split()[0]) if txt else ""
+        out.append({"sport": "mma", "org": org, "event": ev.get("name") or "", "date": date, "a": a, "b": b,
+                    "w": "a" if wa and not wb else "b" if wb and not wa else "draw",
+                    "method": m + (" (" + det.capitalize() + ")" if det else ""), "round": rd.group(1) if rd else None,
+                    "time": None, "title": None, "src": "next-fight"})
+    return out
+
 def results_of(page, ev, date, org):
+    card = card_results(page, ev, date, org)
+    if card:
+        return card
     out = []
     m = re.search(r"Top fight results:(.*?)</ul>", page, re.S)
     for li in re.findall(r"<li>(.*?)</li>", m.group(1) if m else "", re.S):
