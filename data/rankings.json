@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-24T06:56Z",
+ "updated": "2026-11-25T06:59Z",
  "src": null,
  "media": [
   {
@@ -43,27 +43,27 @@
     {
      "rank": 8,
      "name": "Ciryl Gane",
-     "sub": "▲ 4"
+     "sub": ""
     },
     {
      "rank": 9,
      "name": "Tom Aspinall",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 10,
      "name": "Merab Dvalishvili",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 11,
      "name": "Alex Pereira",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 12,
      "name": "Khamzat Chimaev",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 13,
@@ -92,12 +92,12 @@
     },
     {
      "rank": 1,
-     "name": "Alexandre Pantoja",
-     "sub": ""
+     "name": "Manel Kape",
+     "sub": "▲ 1"
     },
     {
-     "rank": 2,
-     "name": "Manel Kape",
+     "rank": 1,
+     "name": "Alexandre Pantoja",
      "sub": ""
     },
     {
@@ -147,12 +147,12 @@
     },
     {
      "rank": 12,
-     "name": "Steve Erceg",
+     "name": "Sumudaerji",
      "sub": ""
     },
     {
      "rank": 12,
-     "name": "Sumudaerji",
+     "name": "Steve Erceg",
      "sub": ""
     },
     {
@@ -232,12 +232,12 @@
     },
     {
      "rank": 12,
-     "name": "Deiveson Figueiredo",
-     "sub": ""
+     "name": "Marcus McGhee",
+     "sub": "▲ 1"
     },
     {
-     "rank": 13,
-     "name": "Marcus McGhee",
+     "rank": 12,
+     "name": "Deiveson Figueiredo",
      "sub": ""
     },
     {
@@ -266,9 +266,9 @@
      "sub": ""
     },
     {
-     "rank": 2,
+     "rank": 1,
      "name": "Diego Lopes",
-     "sub": ""
+     "sub": "▲ 1"
     },
     {
      "rank": 3,
@@ -277,33 +277,33 @@
     },
     {
      "rank": 4,
-     "name": "Aljamain Sterling",
-     "sub": ""
+     "name": "Jean Silva",
+     "sub": "▲ 1"
     },
     {
      "rank": 5,
-     "name": "Jean Silva",
-     "sub": ""
+     "name": "Kevin Vallejos",
+     "sub": "▲ 4"
     },
     {
      "rank": 6,
-     "name": "Arnold Allen",
-     "sub": ""
+     "name": "Aljamain Sterling",
+     "sub": "▼ 2"
     },
     {
      "rank": 7,
-     "name": "Yair Rodriguez",
-     "sub": ""
+     "name": "Arnold Allen",
+     "sub": "▼ 1"
     },
     {
      "rank": 8,
-     "name": "Youssef Zalal",
-     "sub": ""
+     "name": "Yair Rodriguez",
+     "sub": "▼ 1"
     },
     {
      "rank": 9,
-     "name": "Kevin Vallejos",
-     "sub": ""
+     "name": "Youssef Zalal",
+     "sub": "▼ 1"
     },
     {
      "rank": 10,
@@ -318,21 +318,21 @@
     {
      "rank": 12,
      "name": "Patricio Pitbull",
-     "sub": "▲ 2"
+     "sub": ""
     },
     {
      "rank": 13,
-     "name": "Brian Ortega",
-     "sub": ""
+     "name": "Pat Sabatini",
+     "sub": "▲ 2"
     },
     {
      "rank": 14,
      "name": "David Onama",
-     "sub": "▲ 1"
+     "sub": ""
     },
     {
      "rank": 15,
-     "name": "Pat Sabatini",
+     "name": "Josh Emmett",
      "sub": "Nouveau"
     }
    ]
@@ -482,12 +482,12 @@
     },
     {
      "rank": 11,
-     "name": "Yaroslav Amosov",
+     "name": "Uroš Medić",
      "sub": "▲ 1"
     },
     {
      "rank": 12,
-     "name": "Uroš Medić",
+     "name": "Yaroslav Amosov",
      "sub": "▼ 1"
     },
     {
@@ -498,12 +498,12 @@
     {
      "rank": 14,
      "name": "Kevin Holland",
-     "sub": "▲ 1"
+     "sub": ""
     },
     {
      "rank": 15,
      "name": "Daniel Rodriguez",
-     "sub": "▼ 1"
+     "sub": ""
     }
    ]
   },
@@ -567,28 +567,28 @@
     },
     {
      "rank": 11,
-     "name": "Abus Magomedov",
-     "sub": ""
+     "name": "Ikram Aliskerov",
+     "sub": "▲ 2"
     },
     {
      "rank": 12,
-     "name": "Jared Cannonier",
-     "sub": ""
+     "name": "Abus Magomedov",
+     "sub": "▼ 1"
     },
     {
      "rank": 13,
-     "name": "Ikram Aliskerov",
-     "sub": ""
+     "name": "Bo Nickal",
+     "sub": "▲ 1"
     },
     {
      "rank": 14,
-     "name": "Bo Nickal",
-     "sub": ""
+     "name": "Shara Magomedov",
+     "sub": "▲ 1"
     },
     {
      "rank": 15,
-     "name": "Shara Magomedov",
-     "sub": ""
+     "name": "Jared Cannonier",
+     "sub": "▼ 3"
     }
    ]
   },
@@ -607,33 +607,33 @@
     },
     {
      "rank": 2,
-     "name": "Jiří Procházka",
-     "sub": ""
+     "name": "Navajo Stirling",
+     "sub": "▲ 3"
     },
     {
      "rank": 3,
-     "name": "Alex Pereira",
-     "sub": ""
+     "name": "Jiří Procházka",
+     "sub": "▼ 1"
     },
     {
      "rank": 4,
-     "name": "Khalil Rountree Jr.",
-     "sub": ""
+     "name": "Alex Pereira",
+     "sub": "▼ 1"
     },
     {
      "rank": 5,
-     "name": "Navajo Stirling",
-     "sub": ""
+     "name": "Khalil Rountree Jr.",
+     "sub": "▼ 1"
     },
     {
      "rank": 6,
-     "name": "Paulo Costa",
-     "sub": ""
+     "name": "Dominick Reyes",
+     "sub": "▲ 1"
     },
     {
      "rank": 7,
-     "name": "Dominick Reyes",
-     "sub": ""
+     "name": "Paulo Costa",
+     "sub": "▼ 1"
     },
     {
      "rank": 8,
@@ -713,12 +713,12 @@
     {
      "rank": 6,
      "name": "Johnny Walker",
-     "sub": "▲ 1"
+     "sub": ""
     },
     {
      "rank": 7,
      "name": "Rizvan Kuniev",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 8,
@@ -768,12 +768,12 @@
     {
      "rank": 1,
      "name": "Kayla Harrison",
-     "sub": "▲ 1"
+     "sub": ""
     },
     {
      "rank": 2,
      "name": "Valentina Shevchenko",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 3,
@@ -797,48 +797,48 @@
     },
     {
      "rank": 7,
-     "name": "Manon Fiorot",
-     "sub": ""
+     "name": "Amanda Nunes",
+     "sub": "▲ 3"
     },
     {
      "rank": 8,
-     "name": "Tatiana Suarez",
-     "sub": ""
+     "name": "Manon Fiorot",
+     "sub": "▼ 1"
     },
     {
      "rank": 9,
-     "name": "Jasmine Jasudavicius",
-     "sub": ""
+     "name": "Tatiana Suarez",
+     "sub": "▼ 1"
     },
     {
      "rank": 10,
-     "name": "Amanda Nunes",
-     "sub": "Nouveau"
+     "name": "Jasmine Jasudavicius",
+     "sub": "▼ 1"
     },
     {
      "rank": 11,
      "name": "Erin Blanchfield",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 12,
      "name": "Julianna Peña",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 13,
-     "name": "Virna Jandiroba",
-     "sub": "▼ 1"
+     "name": "Rose Namajunas",
+     "sub": "▲ 1"
     },
     {
      "rank": 14,
-     "name": "Rose Namajunas",
-     "sub": "▼ 1"
+     "name": "Denise Gomes",
+     "sub": "▲ 1"
     },
     {
      "rank": 15,
-     "name": "Denise Gomes",
-     "sub": "▼ 1"
+     "name": "Joselyne Edwards",
+     "sub": "Nouveau"
     }
    ]
   },
@@ -862,68 +862,68 @@
     },
     {
      "rank": 3,
-     "name": "Virna Jandiroba",
-     "sub": ""
+     "name": "Denise Gomes",
+     "sub": "▲ 1"
     },
     {
      "rank": 4,
-     "name": "Denise Gomes",
-     "sub": ""
+     "name": "Gillian Robertson",
+     "sub": "▲ 1"
     },
     {
      "rank": 5,
-     "name": "Gillian Robertson",
-     "sub": ""
+     "name": "Fatima Kline",
+     "sub": "▲ 1"
     },
     {
      "rank": 6,
-     "name": "Fatima Kline",
-     "sub": ""
+     "name": "Yan Xiaonan",
+     "sub": "▲ 1"
     },
     {
      "rank": 7,
-     "name": "Yan Xiaonan",
-     "sub": ""
+     "name": "Loopy Godinez",
+     "sub": "▲ 1"
     },
     {
      "rank": 8,
-     "name": "Loopy Godinez",
-     "sub": ""
+     "name": "Alexia Thainara",
+     "sub": "▲ 1"
     },
     {
      "rank": 9,
-     "name": "Alexia Thainara",
-     "sub": ""
+     "name": "Tabatha Ricci",
+     "sub": "▲ 1"
     },
     {
      "rank": 10,
-     "name": "Tabatha Ricci",
-     "sub": ""
+     "name": "Amanda Lemos",
+     "sub": "▲ 1"
     },
     {
      "rank": 11,
-     "name": "Amanda Lemos",
-     "sub": ""
+     "name": "Jéssica Andrade",
+     "sub": "▲ 1"
     },
     {
      "rank": 12,
-     "name": "Jéssica Andrade",
-     "sub": ""
+     "name": "Amanda Ribas",
+     "sub": "▲ 1"
     },
     {
      "rank": 13,
-     "name": "Amanda Ribas",
-     "sub": ""
+     "name": "Piera Rodriguez",
+     "sub": "▲ 1"
     },
     {
      "rank": 14,
-     "name": "Piera Rodriguez",
-     "sub": ""
+     "name": "Angela Hill",
+     "sub": "▲ 1"
     },
     {
      "rank": 15,
-     "name": "Angela Hill",
-     "sub": ""
+     "name": "Mizuki",
+     "sub": "Nouveau"
     }
    ]
   },
@@ -1023,22 +1023,22 @@
     {
      "rank": 1,
      "name": "Amanda Nunes",
-     "sub": "Nouveau"
-    },
-    {
-     "rank": 2,
-     "name": "Julianna Peña",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 2,
      "name": "Joselyne Edwards",
-     "sub": "▼ 1"
+     "sub": ""
+    },
+    {
+     "rank": 2,
+     "name": "Julianna Peña",
+     "sub": ""
     },
     {
      "rank": 4,
      "name": "Ailin Perez",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 5,
@@ -1052,33 +1052,33 @@
     },
     {
      "rank": 7,
-     "name": "Raquel Pennington",
-     "sub": ""
+     "name": "Bia Mesquita",
+     "sub": "▲ 1"
     },
     {
      "rank": 8,
-     "name": "Bia Mesquita",
-     "sub": "▲ 3"
+     "name": "Raquel Pennington",
+     "sub": "▼ 1"
     },
     {
      "rank": 9,
      "name": "Jacqueline Cavalcanti",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 10,
      "name": "Karol Rosa",
-     "sub": "▼ 1"
+     "sub": ""
     },
     {
      "rank": 11,
      "name": "Michelle Montague",
-     "sub": "▲ 1"
+     "sub": ""
     },
     {
      "rank": 12,
      "name": "Macy Chiasson",
-     "sub": "▼ 2"
+     "sub": ""
     },
     {
      "rank": 13,
